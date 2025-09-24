@@ -1,9 +1,6 @@
 # SysML v2 Visualization Tools
 
-Professional Python package for generating SVG diagrams from SysML v2 models. Provides three standalone visualization methods with authentic PlantUML output.
-
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Python package for generating SVG diagrams from SysML v2 models. Provides three standalone visualization methods with PlantUML output.
 
 ## 🎯 Features
 
