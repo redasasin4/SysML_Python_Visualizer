@@ -108,7 +108,7 @@ result = visualizer.visualize_file("model.sysml", "output.svg")
 ```
 
 **Features:**
-- ✅ **Zero Python dependencies** - Pure Python implementation
+- ✅ **Zero Kernel dependencies** - Pure Python implementation
 - ✅ **Complete SysML parsing** - Parts, attributes, actions, relationships
 - ✅ **Standard PlantUML** - Works with any PlantUML installation
 - ✅ **Fast execution** - No kernel overhead
@@ -389,8 +389,8 @@ sysml-v2-visualizer/
 
 ```bash
 # Clone repository
-git clone https://github.com/your-org/sysml-v2-visualizer.git
-cd sysml-v2-visualizer
+git clone https://github.com/redasasin4/SysML_Python_Visualizer.git
+cd SysML_Python_Visualizer
 
 # Install in development mode
 pip install -e .[dev]
@@ -440,9 +440,9 @@ black sysml_visualizer/
 
 ### Getting Help
 
-- 📖 [Documentation](https://github.com/your-org/sysml-v2-visualizer/blob/main/README.md)
-- 🐛 [Bug Reports](https://github.com/your-org/sysml-v2-visualizer/issues)
-- 💬 [Discussions](https://github.com/your-org/sysml-v2-visualizer/discussions)
+- 📖 [Documentation](https://github.com/redasasin4/SysML_Python_Visualizer/blob/main/README.md)
+- 🐛 [Bug Reports](https://github.com/redasasin4/SysML_Python_Visualizer/issues)
+- 💬 [Discussions](https://github.com/redasasin4/SysML_Python_Visualizer/discussions)
 
 ## 📊 Method Comparison
 
