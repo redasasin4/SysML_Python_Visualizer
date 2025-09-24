@@ -13,59 +13,46 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from .kernel_integration import KernelIntegratedSysMLVisualizer
 from .kernel_api import SysMLKernelAPI
-from .standalone import StandaloneSysMLVisualizer
 from .utils import validate_method_dependencies, suggest_installation_commands, print_dependency_status
 
 
 def visualize_file(
     input_file: str,
     output_file: str,
-    method: str = "kernel-integration",
     view: Optional[str] = None,
     style: Optional[str] = None,
     element: Optional[str] = None,
     verbose: bool = False
 ) -> bool:
     """
-    Visualize a SysML file using the specified method.
+    Visualize a SysML file using the SysML Kernel API.
 
     Args:
         input_file: Path to input SysML file
         output_file: Path to output SVG file
-        method: Visualization method ('kernel-integration', 'kernel-api', 'standalone')
-        view: Visualization view type (kernel methods only)
-        style: Visualization style (kernel methods only)
-        element: Specific element to visualize (kernel methods only)
+        view: Visualization view type
+        style: Visualization style
+        element: Specific element to visualize
         verbose: Enable verbose output
 
     Returns:
         True if successful, False otherwise
     """
     try:
-        if method == "kernel-integration":
-            visualizer = KernelIntegratedSysMLVisualizer()
-        elif method == "kernel-api":
-            visualizer = SysMLKernelAPI()
-        elif method == "standalone":
-            visualizer = StandaloneSysMLVisualizer()
-        else:
-            print(f"Error: Unknown method '{method}'")
-            return False
+        visualizer = SysMLKernelAPI()
 
         if verbose:
-            print(f"Using {method} method to visualize {input_file}")
+            print(f"Using SysML Kernel API to visualize {input_file}")
 
-        # Prepare kwargs for kernel methods
+        # Prepare visualization options
         kwargs = {}
-        if method in ["kernel-integration", "kernel-api"]:
-            if view:
-                kwargs['view'] = view
-            if style:
-                kwargs['style'] = style
-            if element:
-                kwargs['element'] = element
+        if view:
+            kwargs['view'] = view
+        if style:
+            kwargs['style'] = style
+        if element:
+            kwargs['element'] = element
 
         result_path = visualizer.visualize_file(input_file, output_file, **kwargs)
 
@@ -88,27 +75,21 @@ def visualize_file(
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
-        description="SysML v2 Visualization Tools - Generate SVG diagrams from SysML files",
+        description="SysML v2 Visualization Tools - Generate authentic SVG diagrams from SysML files using the official SysML Jupyter kernel",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Available methods:
-  kernel-integration  Uses authentic SysML kernel API (recommended)
-  kernel-api         Direct access to SysML Jupyter kernel
-  standalone         Pure Python implementation (no dependencies)
-
 Examples:
   # Basic usage
   sysml-visualize model.sysml output.svg
-  sysml-visualize model.sysml output.svg --method standalone
 
-  # Advanced visualization options (kernel methods only)
-  sysml-visualize model.sysml output.svg --method kernel-api --view Interconnection
-  sysml-visualize model.sysml output.svg --method kernel-integration --view Tree --style stdcolor
-  sysml-visualize model.sysml output.svg --method kernel-api --element "VehicleExample::Vehicle"
+  # Advanced visualization options
+  sysml-visualize model.sysml output.svg --view Interconnection
+  sysml-visualize model.sysml output.svg --view Tree --style stdcolor
+  sysml-visualize model.sysml output.svg --element "VehicleExample::Vehicle"
   sysml-visualize model.sysml output.svg --view Action --style stdcolor --element "PackageName"
 
-Available views (kernel methods): Default, Tree, State, Interconnection, Action, Sequence, Case, MIXED
-Available styles (kernel methods): stdcolor, sysmlbw, monochrome, (and custom kernel styles)
+Available views: Default, Tree, State, Interconnection, Action, Sequence, Case, MIXED
+Available styles: stdcolor, sysmlbw, monochrome, (and custom kernel styles)
         """
     )
 
@@ -124,12 +105,6 @@ Available styles (kernel methods): stdcolor, sysmlbw, monochrome, (and custom ke
         help="Output SVG file path"
     )
 
-    parser.add_argument(
-        "--method", "-m",
-        choices=["kernel-integration", "kernel-api", "standalone"],
-        default="kernel-integration",
-        help="Visualization method (default: kernel-integration)"
-    )
 
     parser.add_argument(
         "--verbose", "-v",
@@ -149,21 +124,21 @@ Available styles (kernel methods): stdcolor, sysmlbw, monochrome, (and custom ke
         help="Check dependency status and exit"
     )
 
-    # Advanced visualization options (kernel methods only)
+    # Visualization options
     parser.add_argument(
         "--view",
         choices=["Default", "Tree", "State", "Interconnection", "Action", "Sequence", "Case", "MIXED"],
-        help="Visualization view type (kernel methods only)"
+        help="Visualization view type"
     )
 
     parser.add_argument(
         "--style",
-        help="Visualization style, e.g., 'stdcolor' (kernel methods only)"
+        help="Visualization style, e.g., 'stdcolor'"
     )
 
     parser.add_argument(
         "--element",
-        help="Specific element to visualize, e.g., 'PackageName::ElementName' (kernel methods only)"
+        help="Specific element to visualize, e.g., 'PackageName::ElementName'"
     )
 
     args = parser.parse_args()
@@ -179,10 +154,10 @@ Available styles (kernel methods): stdcolor, sysmlbw, monochrome, (and custom ke
         parser.print_help()
         sys.exit(1)
 
-    # Validate method dependencies
-    missing_deps = validate_method_dependencies(args.method)
+    # Validate kernel dependencies
+    missing_deps = validate_method_dependencies("kernel-api")
     if missing_deps:
-        print(suggest_installation_commands(args.method))
+        print(suggest_installation_commands("kernel-api"))
         sys.exit(1)
 
     # Validate input file exists
@@ -194,15 +169,10 @@ Available styles (kernel methods): stdcolor, sysmlbw, monochrome, (and custom ke
     output_path = Path(args.output_file)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Validate advanced options are only used with kernel methods
-    if (args.view or args.style or args.element) and args.method == "standalone":
-        print("Warning: --view, --style, and --element options are ignored for standalone method")
-
     # Perform visualization
     success = visualize_file(
         args.input_file,
         args.output_file,
-        args.method,
         args.view,
         args.style,
         args.element,

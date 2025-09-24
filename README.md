@@ -1,10 +1,10 @@
 # SysML v2 Visualization Tools
 
-Python package for generating SVG diagrams from SysML v2 models. Provides three standalone visualization methods with PlantUML output.
+Python package for generating authentic SVG diagrams from SysML v2 models using the official SysML Jupyter kernel infrastructure.
 
 ## 🎯 Features
 
-- **🔥 Three Visualization Methods** - Choose the best approach for your needs
+- **🔥 Official SysML Kernel API** - Direct integration with the SysML v2 kernel
 - **✨ 100% Authentic Output** - Uses official SysML v2 kernel infrastructure
 - **📦 Professional Package** - Easy installation with `pip install`
 - **🖥️ Advanced CLI Interface** - Full kernel view types, styles, and element selection
@@ -29,97 +29,49 @@ sysml-visualize --check-deps
 # Generate SVG from SysML file (default Tree view)
 sysml-visualize model.sysml output.svg
 
-# Use specific visualization method
-sysml-visualize model.sysml output.svg --method standalone
-
-# Use different visualization views (kernel methods only)
-sysml-visualize model.sysml output.svg --method kernel-api --view Interconnection
-sysml-visualize model.sysml output.svg --method kernel-api --view Action --style stdcolor
+# Use different visualization views
+sysml-visualize model.sysml output.svg --view Interconnection
+sysml-visualize model.sysml output.svg --view Action --style stdcolor
 
 # Visualize specific elements
-sysml-visualize model.sysml output.svg --method kernel-api --element "VehicleExample::Vehicle"
+sysml-visualize model.sysml output.svg --element "VehicleExample::Vehicle"
 
 # Combine view, style, and element options
-sysml-visualize model.sysml output.svg --method kernel-api --view Tree --style stdcolor --element "VehicleExample"
+sysml-visualize model.sysml output.svg --view Tree --style stdcolor --element "VehicleExample"
 ```
 
 ### Python API
 
 ```python
-from sysml_visualizer import KernelIntegratedSysMLVisualizer
+from sysml_visualizer import SysMLKernelAPI
 
-visualizer = KernelIntegratedSysMLVisualizer()
+visualizer = SysMLKernelAPI()
 result = visualizer.visualize_file("model.sysml", "output.svg")
 print(f"Generated: {result}")
 ```
 
-## 🎯 Visualization Methods
+## 🎯 SysML Kernel API
 
-### 1. Kernel Integration (Recommended)
-**Best for:** Production use, CI/CD pipelines
-**Note:** Currently uses kernel-api method internally for CLI interface
+**Professional SysML v2 visualization using the official kernel infrastructure**
 
 ```python
-from sysml_visualizer import KernelIntegratedSysMLVisualizer
+from sysml_visualizer import SysMLKernelAPI
 
-visualizer = KernelIntegratedSysMLVisualizer()
+visualizer = SysMLKernelAPI()
 result = visualizer.visualize_file("model.sysml", "output.svg")
 ```
 
 **Features:**
-- ✅ **100% Authentic** - Uses official SysML kernel API
-- ✅ **Complete SysML syntax** - `comp def`, `comp usage`, `skin sysmlbw`
+- ✅ **100% Authentic** - Uses official SysML v2 kernel API
+- ✅ **Complete SysML syntax** - Full `comp def`, `comp usage`, `skin sysmlbw` support
 - ✅ **PSysML protocol** - Full UUID linking support
 - ✅ **Full CLI support** - All kernel view types, styles, and element selection
+- ✅ **Interactive development** - Direct Jupyter kernel access
+- ✅ **Rich visualization** - Tree, Interconnection, Action, State, Sequence, Case, MIXED views
 
 **Requirements:**
 - SysML conda kernel (`conda install -c conda-forge sysml`)
 - jupyter-client (`pip install jupyter-client`)
-
-### 2. Kernel API
-**Best for:** Development, interactive exploration
-
-```python
-from sysml_visualizer import SysMLKernelVisualizer
-
-visualizer = SysMLKernelVisualizer()
-result = visualizer.visualize_file("model.sysml")
-```
-
-**Features:**
-- ✅ **Real kernel execution** - Direct Jupyter kernel access
-- ✅ **Authentic %viz commands** - Native SysML visualization with all options
-- ✅ **Package detection** - Automatic model analysis
-- ✅ **Live kernel session** - Interactive development
-- ✅ **Full view support** - Tree, Interconnection, Action, State, Sequence, Case, MIXED
-- ✅ **Style options** - stdcolor and custom kernel-supported styles
-
-**Requirements:**
-- SysML conda kernel (`conda install -c conda-forge sysml`)
-- jupyter-client (`pip install jupyter-client`)
-
-### 3. Enhanced Standalone
-**Best for:** Minimal dependencies, air-gapped environments
-
-```python
-from sysml_visualizer import StandaloneSysMLVisualizer
-
-visualizer = StandaloneSysMLVisualizer()
-result = visualizer.visualize_file("model.sysml", "output.svg")
-```
-
-**Features:**
-- ✅ **Zero Kernel dependencies** - Pure Python implementation
-- ✅ **Complete SysML parsing** - Parts, attributes, actions, relationships
-- ✅ **Standard PlantUML** - Works with any PlantUML installation
-- ✅ **Fast execution** - No kernel overhead
-- ⚠️ **Limited view options** - Basic tree structure only (no kernel views)
-- ⚠️ **No style support** - Uses default PlantUML styling
-- ⚠️ **Does Not Fully Support SysML V2** - simple parser with minimal testing
-
-**Requirements:**
-- GraphViz (`apt install graphviz` / `brew install graphviz`)
-- PlantUML (`apt install plantuml` / `brew install plantuml`)
 
 ## 📦 Installation
 
@@ -128,7 +80,7 @@ result = visualizer.visualize_file("model.sysml", "output.svg")
 1. **Python 3.8+**
 2. **Choose your method dependencies:**
 
-#### For Kernel Methods (1 & 2):
+#### For SysML Kernel API:
 ```bash
 # Install conda if needed
 curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
@@ -141,15 +93,6 @@ conda install -c conda-forge sysml
 jupyter kernelspec list  # Should show 'sysml' kernel
 ```
 
-#### For Standalone Method (3):
-```bash
-# Ubuntu/Debian
-sudo apt install graphviz plantuml
-
-# macOS
-brew install graphviz plantuml
-```
-
 ### Package Installation
 
 ```bash
@@ -157,8 +100,7 @@ brew install graphviz plantuml
 pip install sysml-v2-visualizer
 
 # Install with optional dependencies
-pip install sysml-v2-visualizer[kernel]     # For kernel methods
-pip install sysml-v2-visualizer[standalone] # For standalone method
+pip install sysml-v2-visualizer[kernel]     # For kernel API
 pip install sysml-v2-visualizer[dev]        # For development
 ```
 
@@ -167,20 +109,16 @@ pip install sysml-v2-visualizer[dev]        # For development
 ### Command Line Interface
 
 ```bash
-# Check what methods are available
+# Check dependencies
 sysml-visualize --check-deps
 
-# Basic usage (uses kernel-integration by default)
+# Basic usage
 sysml-visualize examples/working_vehicle.sysml output.svg
 
-# Specify method explicitly
-sysml-visualize model.sysml output.svg --method kernel-api
-sysml-visualize model.sysml output.svg --method standalone
-
-# Advanced visualization options (kernel methods only)
-sysml-visualize model.sysml output.svg --method kernel-api --view Interconnection
-sysml-visualize model.sysml output.svg --method kernel-api --view Action --style stdcolor
-sysml-visualize model.sysml output.svg --method kernel-api --view Tree --element "PackageName::ElementName"
+# Advanced visualization options
+sysml-visualize model.sysml output.svg --view Interconnection
+sysml-visualize model.sysml output.svg --view Action --style stdcolor
+sysml-visualize model.sysml output.svg --view Tree --element "PackageName::ElementName"
 
 # Verbose output for debugging
 sysml-visualize model.sysml output.svg --verbose
@@ -191,7 +129,7 @@ sysml-visualize --help
 
 ### Advanced Visualization Options
 
-The kernel-based methods (kernel-integration and kernel-api) support the full range of official SysML v2 visualization options:
+The SysML kernel API supports the full range of official SysML v2 visualization options:
 
 #### Available Views
 ```bash
@@ -241,12 +179,12 @@ sysml-visualize model.sysml output.svg --view Action --style stdcolor --element 
 ### Python API Examples
 
 ```python
-# Example 1: Kernel Integration (Recommended)
-from sysml_visualizer import KernelIntegratedSysMLVisualizer
+# Example 1: Kernel API (Recommended)
+from sysml_visualizer import SysMLKernelAPI
 
-visualizer = KernelIntegratedSysMLVisualizer()
+visualizer = SysMLKernelAPI()
 
-# Basic usage
+# Basic file visualization
 result = visualizer.visualize_file("model.sysml", "output.svg")
 print(f"Generated {Path(result).stat().st_size} byte SVG")
 
@@ -258,32 +196,17 @@ result = visualizer.visualize_file("model.sysml", "output.svg",
 result = visualizer.visualize_file("model.sysml", "output.svg",
                                   view="Tree", element="VehicleExample::Vehicle")
 
-# Example 2: Standalone (No dependencies)
-from sysml_visualizer import StandaloneSysMLVisualizer
-
-visualizer = StandaloneSysMLVisualizer()
-result = visualizer.visualize_file("model.sysml", "output.svg")
-
-# Example 3: Kernel API (Interactive)
-from sysml_visualizer import SysMLKernelVisualizer
-
-visualizer = SysMLKernelVisualizer()
-
-# Direct SysML code with visualization options
+# Direct SysML code visualization (interactive)
 result = visualizer.visualize("package Demo { part def Vehicle; }",
                              view="Action", style="stdcolor")
 
-# File-based visualization with options
-result = visualizer.visualize_file("model.sysml",
-                                  view="Interconnection",
-                                  element="Demo::Vehicle")
 ```
 
 ## 📖 Command Reference
 
 ### Available View Types
 
-All kernel-based methods (kernel-integration and kernel-api) support the full range of official SysML v2 visualization views:
+The SysML Kernel API supports the full range of official SysML v2 visualization views:
 
 - **Default**: Default kernel view
 - **Tree** (default): Hierarchical structure view showing element relationships
@@ -296,24 +219,17 @@ All kernel-based methods (kernel-integration and kernel-api) support the full ra
 
 ### Available Styles
 
-Kernel methods support various styling options to enhance visual presentation:
+The SysML Kernel API supports various styling options to enhance visual presentation:
 
 - **stdcolor**: Standard color scheme for improved readability
 - **sysmlbw**: Black and white SysML styling (built-in)
 - **monochrome**: Monochrome styling option
 - **Custom styles**: Any style supported by the underlying PlantUML/SysML kernel
 
-*Note: The standalone method uses default PlantUML styling and does not support custom styles.*
 
 ### CLI Options Reference
 
-#### Core Options
-- `--method <METHOD>`: Choose visualization method
-  - `kernel-integration` (default): Production-ready kernel integration
-  - `kernel-api`: Direct kernel API access for development
-  - `standalone`: Minimal dependencies, air-gapped environments
-
-#### Visualization Options (Kernel Methods Only)
+#### Visualization Options
 - `--view <VIEW_TYPE>`: Specify visualization view type (see Available View Types)
 - `--style <STYLE>`: Apply styling options (see Available Styles)
 - `--element <ELEMENT_PATH>`: Target specific model element
@@ -370,16 +286,15 @@ jobs:
 
 ```
 sysml-v2-visualizer/
-├── sysml_visualizer/
+├── src/
 │   ├── __init__.py              # Package exports
-│   ├── kernel_integration.py   # Method 1: Kernel Integration
-│   ├── kernel_api.py           # Method 2: Kernel API
-│   ├── standalone.py           # Method 3: Enhanced Standalone
+│   ├── kernel_api.py           # SysML Kernel API
 │   ├── cli.py                  # Command line interface
 │   ├── utils.py                # Utility functions
-│   ├── examples/               # Example SysML files
-│   │   ├── working_vehicle.sysml
 │   └── sysmlbw.skin           # Authentic SysML skin file
+├── examples/                   # Example SysML files and generated SVGs
+│   ├── working_vehicle.sysml
+│   └── *.svg                  # Generated example visualizations
 ├── setup.py                    # Package configuration
 └── README.md                   # This file
 ```
@@ -400,7 +315,7 @@ pip install -e .[dev]
 pytest
 
 # Format code
-black sysml_visualizer/
+black src/
 ```
 
 ### Adding New Features
@@ -408,7 +323,7 @@ black sysml_visualizer/
 1. Create feature branch: `git checkout -b feature/new-feature`
 2. Implement changes with tests
 3. Ensure all tests pass: `pytest`
-4. Format code: `black sysml_visualizer/`
+4. Format code: `black src/`
 5. Submit pull request
 
 ## 🔧 Troubleshooting
@@ -430,8 +345,8 @@ black sysml_visualizer/
    # Check what's available
    sysml-visualize --check-deps
 
-   # Get installation suggestions
-   sysml-visualize model.sysml output.svg --method kernel-integration
+   # Use with verbose output for troubleshooting
+   sysml-visualize model.sysml output.svg --verbose
    ```
 
 3. **No SVG Output**

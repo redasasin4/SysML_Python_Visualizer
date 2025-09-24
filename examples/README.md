@@ -94,57 +94,8 @@ python src/kernel_api.py viz_file examples/working_vehicle.sysml examples/workin
 
 ---
 
-### 3. Kernel Integration Examples
-
-#### Tree View with Standard Color
-
-**Command:**
-```bash
-python src/kernel_integration.py examples/working_vehicle.sysml examples/kernel_integration_working_vehicle_tree_stdcolor.svg --view Tree --style stdcolor
-```
-
-**Generated File:** `kernel_integration_working_vehicle_tree_stdcolor.svg` (20,963 bytes)
-
-**Description:** Same as kernel_api tree view but generated through the kernel integration wrapper.
-
-#### Tree View of Specific Element
-
-**Command:**
-```bash
-python src/kernel_integration.py examples/working_vehicle.sysml examples/kernel_integration_working_vehicle_Vehicle_tree.svg --view Tree --element "VehicleExample::Vehicle"
-```
-
-**Generated File:** `kernel_integration_working_vehicle_Vehicle_tree.svg` (8,661 bytes)
-
-**Description:** Element-specific tree view generated through kernel integration interface.
-
-#### Interconnection View
-
-**Command:**
-```bash
-python src/kernel_integration.py examples/working_vehicle.sysml examples/kernel_integration_working_vehicle_VehicleExample_interconnection.svg --view Interconnection --element "VehicleExample"
-```
-
-**Generated File:** `kernel_integration_working_vehicle_VehicleExample_interconnection.svg` (15,651 bytes)
-
-**Description:** Interconnection view generated through kernel integration wrapper.
-
-#### Action View
-
-**Command:**
-```bash
-python src/kernel_integration.py examples/working_vehicle.sysml examples/kernel_integration_working_vehicle_action.svg --view Action
-```
-
-**Generated File:** `kernel_integration_working_vehicle_action.svg` (5,890 bytes)
-
-**Description:** Action view generated through kernel integration interface.
-
----
-
 ## Usage Notes
 
 1. All commands assume execution from the project root directory
-2. Kernel methods require the SysML conda environment to be active
+2. Kernel API method requires the SysML conda environment to be active
 3. File sizes may vary slightly between generations due to unique IDs
-4. Both kernel methods produce identical output (kernel_integration uses kernel_api internally)
