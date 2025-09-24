@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="226px" preserveAspectRatio="none" style="width:361px;height:226px;background:#FFFFFF;" version="1.1" viewBox="0 0 361 226" width="361px" zoomAndPan="magnify"><defs/><g><!--MD5=[e4f7fae6ed58524ba242bb0b0d3be6b7]
+cluster E2--><g id="cluster_E2"><a href="psysml:8e2a29aa-f816-45ea-af78-9e64e1d0946f" target="_top" title="psysml:8e2a29aa-f816-45ea-af78-9e64e1d0946f" xlink:actuate="onRequest" xlink:href="psysml:8e2a29aa-f816-45ea-af78-9e64e1d0946f" xlink:show="new" xlink:title="psysml:8e2a29aa-f816-45ea-af78-9e64e1d0946f" xlink:type="simple"><rect fill="#FFFFFF" height="139" id="E2" rx="10" ry="10" style="stroke:#383838;stroke-width:1.5;" width="173" x="104.5" y="81"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="45" x="168.5" y="98.8281">«action»</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="96" x="143" y="117.31">Vehicle_Action</text><line style="stroke:#383838;stroke-width:1.0;" x1="104.5" x2="277.5" y1="126.412" y2="126.412"/></a></g><g><a href="psysml:624ae6af-8885-4ed2-b016-adecdc4da2c4" target="_top" title="psysml:624ae6af-8885-4ed2-b016-adecdc4da2c4" xlink:actuate="onRequest" xlink:href="psysml:624ae6af-8885-4ed2-b016-adecdc4da2c4" xlink:show="new" xlink:title="psysml:624ae6af-8885-4ed2-b016-adecdc4da2c4" xlink:type="simple"><rect fill="#FFFFFF" height="50.412" id="E1" rx="10" ry="10" style="stroke:#383838;stroke-width:1.5;" width="107" x="7" y="7"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="57" x="32" y="24.8281">«perform»</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="96" x="12.5" y="43.31">Vehicle_Action</text></a></g><g><a href="psysml:c2b73d8d-079d-427f-ad7d-ad052f14c04f" target="_top" title="psysml:c2b73d8d-079d-427f-ad7d-ad052f14c04f" xlink:actuate="onRequest" xlink:href="psysml:c2b73d8d-079d-427f-ad7d-ad052f14c04f" xlink:show="new" xlink:title="psysml:c2b73d8d-079d-427f-ad7d-ad052f14c04f" xlink:type="simple"><rect fill="#FFFFFF" height="50.412" id="E3" rx="10" ry="10" style="stroke:#383838;stroke-width:1.5;" width="106" x="147.5" y="146"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="45" x="178" y="163.8281">«action»</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="95" x="153" y="182.31">Engine_Action</text></a></g><g><a href="psysml:daac91d0-f9ac-4f52-b88d-2fb608d08ad5" target="_top" title="psysml:daac91d0-f9ac-4f52-b88d-2fb608d08ad5" xlink:actuate="onRequest" xlink:href="psysml:daac91d0-f9ac-4f52-b88d-2fb608d08ad5" xlink:show="new" xlink:title="psysml:daac91d0-f9ac-4f52-b88d-2fb608d08ad5" xlink:type="simple"><rect fill="#FFFFFF" height="50.412" id="E4" rx="10" ry="10" style="stroke:#383838;stroke-width:1.5;" width="206" x="149.5" y="7"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="57" x="224" y="24.8281">«perform»</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="195" x="155" y="43.31">Vehicle_Action.Engine_Action</text></a></g><!--MD5=[1f1cd8e6dd4c1b2ca2aaccc9b9bcea6e]
+link E1 to E2--><g id="link_E1_E2"><a href="psysml:d9978e59-f378-4304-8cae-70ce38b1870a" target="_top" title="psysml:d9978e59-f378-4304-8cae-70ce38b1870a" xlink:actuate="onRequest" xlink:href="psysml:d9978e59-f378-4304-8cae-70ce38b1870a" xlink:show="new" xlink:title="psysml:d9978e59-f378-4304-8cae-70ce38b1870a" xlink:type="simple"><path d="M69.68,57.18 C77.025,76.535 87.5125,104.1675 96.27,127.2412 C98.4594,133.0097 100.5406,138.4932 102.4376,143.4912 C102.9119,144.7407 103.3746,145.9599 103.8246,147.1456 C104.0496,147.7384 104.2715,148.3229 104.49,148.8986 " fill="none" id="E1-to-E2" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#FFFFFF" points="104.49,148.8986,104.2923,128.6511,91.2034,133.619,104.49,148.8986" style="stroke:#181818;stroke-width:1.0;"/></a></g><!--MD5=[f0cdf4548168e5211fb3a02bf679d63a]
+link E4 to E3--><g id="link_E4_E3"><a href="psysml:7abbe217-41fb-4eac-9193-d6c4a739d48a" target="_top" title="psysml:7abbe217-41fb-4eac-9193-d6c4a739d48a" xlink:actuate="onRequest" xlink:href="psysml:7abbe217-41fb-4eac-9193-d6c4a739d48a" xlink:show="new" xlink:title="psysml:7abbe217-41fb-4eac-9193-d6c4a739d48a" xlink:type="simple"><path d="M243.32,57.18 C236.02,76.43 225.6,103.86 216.88,126.86 " fill="none" id="E4-to-E3" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="223.4,129.39,209.76,145.6,210.31,124.42,223.4,129.39" style="stroke:#181818;stroke-width:1.0;"/></a></g><!--MD5=[9fb8a671cb5bd620aae6b33efbc9be0a]
+@startuml
+skin sysmlbw
+skinparam monochrome true
+skinparam wrapWidth 300
+hide circle
+skinparam ranksep 8
+
+rec usage "Vehicle_Action" as E1  << perform>> [[psysml:624ae6af-8885-4ed2-b016-adecdc4da2c4 ]] {
+}
+
+rec usage "Vehicle_Action" as E2  <<(T,blue) action>> [[psysml:8e2a29aa-f816-45ea-af78-9e64e1d0946f ]] {
+rec usage "Engine_Action" as E3  <<(T,blue) action>> [[psysml:c2b73d8d-079d-427f-ad7d-ad052f14c04f ]] {
+}
+
+}
+
+E1 - -|> E2 [[psysml:d9978e59-f378-4304-8cae-70ce38b1870a ]] 
+rec usage "Vehicle_Action.Engine_Action" as E4  << perform>> [[psysml:daac91d0-f9ac-4f52-b88d-2fb608d08ad5 ]] {
+}
+
+E4 - -|> E3 [[psysml:7abbe217-41fb-4eac-9193-d6c4a739d48a ]] 
+@enduml
+
+PlantUML version 1.2022.7(Mon Aug 22 10:01:30 PDT 2022)
+(EPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>
