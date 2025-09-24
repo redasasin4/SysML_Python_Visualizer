@@ -34,13 +34,13 @@ sysml-visualize model.sysml output.svg --method standalone
 
 # Use different visualization views (kernel methods only)
 sysml-visualize model.sysml output.svg --method kernel-api --view Interconnection
-sysml-visualize model.sysml output.svg --method kernel-integration --view Action --style stdcolor
+sysml-visualize model.sysml output.svg --method kernel-api --view Action --style stdcolor
 
 # Visualize specific elements
 sysml-visualize model.sysml output.svg --method kernel-api --element "VehicleExample::Vehicle"
 
 # Combine view, style, and element options
-sysml-visualize model.sysml output.svg --method kernel-integration --view Tree --style stdcolor --element "VehicleExample"
+sysml-visualize model.sysml output.svg --method kernel-api --view Tree --style stdcolor --element "VehicleExample"
 ```
 
 ### Python API
@@ -57,6 +57,7 @@ print(f"Generated: {result}")
 
 ### 1. Kernel Integration (Recommended)
 **Best for:** Production use, CI/CD pipelines
+**Note:** Currently uses kernel-api method internally for CLI interface
 
 ```python
 from sysml_visualizer import KernelIntegratedSysMLVisualizer
@@ -178,7 +179,7 @@ sysml-visualize model.sysml output.svg --method standalone
 
 # Advanced visualization options (kernel methods only)
 sysml-visualize model.sysml output.svg --method kernel-api --view Interconnection
-sysml-visualize model.sysml output.svg --method kernel-integration --view Action --style stdcolor
+sysml-visualize model.sysml output.svg --method kernel-api --view Action --style stdcolor
 sysml-visualize model.sysml output.svg --method kernel-api --view Tree --element "PackageName::ElementName"
 
 # Verbose output for debugging
@@ -437,27 +438,6 @@ black sysml_visualizer/
    - Ensure your SysML code defines packages/elements
    - Check that SysML syntax is valid
    - Try the working example first: `sysml-visualizer/examples/working_vehicle.sysml`
-
-### Getting Help
-
-- 📖 [Documentation](https://github.com/redasasin4/SysML_Python_Visualizer/blob/main/README.md)
-- 🐛 [Bug Reports](https://github.com/redasasin4/SysML_Python_Visualizer/issues)
-- 💬 [Discussions](https://github.com/redasasin4/SysML_Python_Visualizer/discussions)
-
-## 📊 Method Comparison
-
-| Feature | Kernel Integration | Kernel API | Standalone |
-|---------|-------------------|------------|------------|
-| **Authenticity** | 100% | 100% | ~95% |
-| **Dependencies** | Kernel + Python | Kernel + Python | GraphViz + PlantUML |
-| **Speed** | Fast | Medium | Fast |
-| **CI/CD Ready** | ✅ | ✅ | ✅ |
-| **Air-gapped** | ❌ | ❌ | ✅ |
-| **Interactive** | ❌ | ✅ | ❌ |
-| **View Options** | All kernel views | All kernel views | Limited |
-| **Style Support** | Full kernel styles | Full kernel styles | Basic |
-| **Element Selection** | ✅ | ✅ | ❌ |
-
 
 ## 🤝 Contributing
 

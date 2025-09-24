@@ -235,6 +235,58 @@ class SysMLKernelAPI:
 
         return outputs
 
+    def visualize_file(self, input_file, output_file=None, view=None, style=None, element=None):
+        """
+        Visualize a SysML file and optionally save to output file.
+
+        Args:
+            input_file (str): Path to SysML file to visualize
+            output_file (str, optional): Path to save SVG output
+            view (str, optional): Visualization view type
+            style (str, optional): Visualization style
+            element (str, optional): Specific element to visualize
+
+        Returns:
+            str: Path to output file or 'kernel_output.svg' if no output specified
+        """
+        from pathlib import Path
+
+        # Read the SysML file
+        sysml_path = Path(input_file)
+        if not sysml_path.exists():
+            raise FileNotFoundError(f"SysML file not found: {input_file}")
+
+        sysml_code = sysml_path.read_text()
+
+        # Generate visualization
+        self.start_kernel()
+        try:
+            outputs = self.visualize(sysml_code, view=view, style=style, element=element)
+
+            # Extract SVG from outputs
+            svg_content = None
+            for output in outputs:
+                if output['type'] == 'display_data' and 'data' in output:
+                    if 'image/svg+xml' in output['data']:
+                        svg_content = output['data']['image/svg+xml']
+                        break
+                elif output['type'] == 'execute_result' and 'data' in output:
+                    if 'image/svg+xml' in output['data']:
+                        svg_content = output['data']['image/svg+xml']
+                        break
+
+            if not svg_content:
+                raise RuntimeError("No SVG content generated from kernel")
+
+            # Save to output file
+            output_path = output_file or "kernel_output.svg"
+            Path(output_path).write_text(svg_content)
+
+            return output_path
+
+        finally:
+            self.stop_kernel()
+
     def stop_kernel(self):
         """Stop the kernel"""
         if self.kc:
