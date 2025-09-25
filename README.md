@@ -6,6 +6,7 @@ Python package for generating authentic SVG diagrams from SysML v2 models using 
 
 - **🔥 Official SysML Kernel API** - Direct integration with the SysML v2 kernel
 - **✨ 100% Authentic Output** - Uses official SysML v2 kernel infrastructure
+- **🚀 Auto-Discovery Mode** - Automatically finds and processes all .sysml files in your repository
 - **📦 Professional Package** - Easy installation with `pip install`
 - **🖥️ Advanced CLI Interface** - Full kernel view types, styles, and element selection
 - **🎨 Rich Visualization Options** - Tree, Interconnection, Action, State, Sequence, Case, MIXED views
@@ -26,24 +27,18 @@ pip install sysml-v2-visualizer
 # Check dependencies
 sysml-visualize --check-deps
 
-# Generate SVG from SysML file (default Tree view)
-sysml-visualize model.sysml output.svg
-
-# Use different visualization views
-sysml-visualize model.sysml output.svg --view Interconnection
-sysml-visualize model.sysml output.svg --view Action --style stdcolor
-
-# Visualize specific elements
-sysml-visualize model.sysml output.svg --element "VehicleExample::Vehicle"
-
-# Combine view, style, and element options
-sysml-visualize model.sysml output.svg --view Tree --style stdcolor --element "VehicleExample"
+# Auto-discovery mode - Finds all .sysml files automatically
+sysml-visualize output.svg --element "VehicleExample::Vehicle"
+sysml-visualize output.svg --element "PackageName::ElementName" --view Interconnection
+sysml-visualize output.svg --element "MyPackage" --view Tree --style stdcolor
 ```
 
 ### Python API
 
 ```python
-from sysml_visualizer import SysMLKernelAPI
+import sys
+sys.path.insert(0, 'src')
+from kernel_api import SysMLKernelAPI
 
 visualizer = SysMLKernelAPI()
 result = visualizer.visualize_file("model.sysml", "output.svg")
@@ -112,16 +107,16 @@ pip install sysml-v2-visualizer[dev]        # For development
 # Check dependencies
 sysml-visualize --check-deps
 
-# Basic usage
-sysml-visualize examples/working_vehicle.sysml output.svg
+# Auto-discovery mode (finds all .sysml files in repo)
+sysml-visualize output.svg --element "VehicleExample::Vehicle"
+sysml-visualize output.svg --element "PackageName::ElementName" --view Interconnection
+sysml-visualize output.svg --element "MyPackage" --view Tree --style stdcolor
 
-# Advanced visualization options
-sysml-visualize model.sysml output.svg --view Interconnection
-sysml-visualize model.sysml output.svg --view Action --style stdcolor
-sysml-visualize model.sysml output.svg --view Tree --element "PackageName::ElementName"
+# With different views and styles
+sysml-visualize output.svg --view Action --style stdcolor --element "PackageName::ElementName"
 
 # Verbose output for debugging
-sysml-visualize model.sysml output.svg --verbose
+sysml-visualize output.svg --element "VehicleExample::Vehicle" --verbose
 
 # Show help
 sysml-visualize --help
@@ -134,53 +129,55 @@ The SysML kernel API supports the full range of official SysML v2 visualization 
 #### Available Views
 ```bash
 # Tree view (default) - Hierarchical structure
-sysml-visualize model.sysml output.svg --view Tree
+sysml-visualize output.svg --view Tree
 
 # Interconnection view - Shows relationships and connections
-sysml-visualize model.sysml output.svg --view Interconnection
+sysml-visualize output.svg --view Interconnection
 
 # Action view - Focuses on action elements and flows
-sysml-visualize model.sysml output.svg --view Action
+sysml-visualize output.svg --view Action
 
 # State view - State-based diagrams
-sysml-visualize model.sysml output.svg --view State
+sysml-visualize output.svg --view State
 
 # Sequence view - Sequence diagrams
-sysml-visualize model.sysml output.svg --view Sequence
+sysml-visualize output.svg --view Sequence
 
 # Case view - Use case scenarios
-sysml-visualize model.sysml output.svg --view Case
+sysml-visualize output.svg --view Case
 
 # Mixed view - Combination of multiple views
-sysml-visualize model.sysml output.svg --view MIXED
+sysml-visualize output.svg --view MIXED
 ```
 
 #### Styling Options
 ```bash
 # Standard color scheme
-sysml-visualize model.sysml output.svg --view Tree --style stdcolor
+sysml-visualize output.svg --view Tree --style stdcolor
 
 # Custom styles (as supported by kernel)
-sysml-visualize model.sysml output.svg --view Interconnection --style custom
+sysml-visualize output.svg --view Interconnection --style custom
 ```
 
 #### Element-Specific Visualization
 ```bash
 # Visualize entire package
-sysml-visualize model.sysml output.svg --element "VehicleExample"
+sysml-visualize output.svg --element "VehicleExample"
 
 # Visualize specific part definition
-sysml-visualize model.sysml output.svg --element "VehicleExample::Vehicle"
+sysml-visualize output.svg --element "VehicleExample::Vehicle"
 
 # Combine with views and styles
-sysml-visualize model.sysml output.svg --view Action --style stdcolor --element "VehicleExample::Vehicle"
+sysml-visualize output.svg --view Action --style stdcolor --element "VehicleExample::Vehicle"
 ```
 
 ### Python API Examples
 
 ```python
-# Example 1: Kernel API (Recommended)
-from sysml_visualizer import SysMLKernelAPI
+# Kernel API (Recommended)
+import sys
+sys.path.insert(0, 'src')
+from kernel_api import SysMLKernelAPI
 
 visualizer = SysMLKernelAPI()
 
@@ -199,7 +196,6 @@ result = visualizer.visualize_file("model.sysml", "output.svg",
 # Direct SysML code visualization (interactive)
 result = visualizer.visualize("package Demo { part def Vehicle; }",
                              view="Action", style="stdcolor")
-
 ```
 
 ## 📖 Command Reference

@@ -21,7 +21,7 @@ setup(
     version="1.0.0",
     author="SysML v2 Visualization Project",
     author_email="",
-    description="Three standalone options for visualizing SysML v2 models as SVG diagrams",
+    description="SysML v2 model visualization tool with auto-discovery - visualize elements without specifying files",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/your-org/sysml-v2-visualizer",
@@ -47,12 +47,11 @@ setup(
     install_requires=requirements,
     extras_require={
         "kernel": ["jupyter-client", "ipykernel"],
-        "standalone": ["graphviz"],
         "dev": ["pytest", "black", "flake8", "mypy"],
     },
     entry_points={
         "console_scripts": [
-            "sysml-visualize=src.cli:main",
+            "sysml-visualize=cli:main",
         ],
     },
     include_package_data=True,

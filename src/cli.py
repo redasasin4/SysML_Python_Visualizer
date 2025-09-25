@@ -2,10 +2,7 @@
 """
 SysML v2 Visualization Tools - Command Line Interface
 
-Provides command-line access to all three visualization options:
-1. Kernel Integration (--method kernel-integration)
-2. Kernel API (--method kernel-api)
-3. Enhanced Standalone (--method standalone)
+Provides command-line access to SysML v2 visualization using the Kernel API method.
 """
 
 import argparse
@@ -13,12 +10,15 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from .kernel_api import SysMLKernelAPI
-from .utils import validate_method_dependencies, suggest_installation_commands, print_dependency_status
+try:
+    from .kernel_api import SysMLKernelAPI
+    from .utils import validate_method_dependencies, suggest_installation_commands, print_dependency_status, find_sysml_files, combine_sysml_files
+except ImportError:
+    from kernel_api import SysMLKernelAPI
+    from utils import validate_method_dependencies, suggest_installation_commands, print_dependency_status, find_sysml_files, combine_sysml_files
 
 
 def visualize_file(
-    input_file: str,
     output_file: str,
     view: Optional[str] = None,
     style: Optional[str] = None,
@@ -26,10 +26,9 @@ def visualize_file(
     verbose: bool = False
 ) -> bool:
     """
-    Visualize a SysML file using the SysML Kernel API.
+    Visualize SysML files using the SysML Kernel API with auto-discovery.
 
     Args:
-        input_file: Path to input SysML file
         output_file: Path to output SVG file
         view: Visualization view type
         style: Visualization style
@@ -42,8 +41,22 @@ def visualize_file(
     try:
         visualizer = SysMLKernelAPI()
 
+        # Auto-discover all .sysml files
+        sysml_files = find_sysml_files()
+        if not sysml_files:
+            print("❌ No .sysml files found in current directory or subdirectories")
+            return False
+
         if verbose:
-            print(f"Using SysML Kernel API to visualize {input_file}")
+            print(f"Auto-discovered {len(sysml_files)} .sysml files:")
+            for f in sysml_files:
+                print(f"  - {f}")
+
+        # Combine all files
+        combined_content = combine_sysml_files(sysml_files)
+
+        if verbose:
+            print("Using SysML Kernel API to visualize all discovered files")
 
         # Prepare visualization options
         kwargs = {}
@@ -54,7 +67,8 @@ def visualize_file(
         if element:
             kwargs['element'] = element
 
-        result_path = visualizer.visualize_file(input_file, output_file, **kwargs)
+        # Use visualize_content instead of visualize_file
+        result_path = visualizer.visualize_content(combined_content, output_file, **kwargs)
 
         if Path(result_path).exists():
             file_size = Path(result_path).stat().st_size
@@ -79,24 +93,14 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Basic usage
-  sysml-visualize model.sysml output.svg
-
-  # Advanced visualization options
-  sysml-visualize model.sysml output.svg --view Interconnection
-  sysml-visualize model.sysml output.svg --view Tree --style stdcolor
-  sysml-visualize model.sysml output.svg --element "VehicleExample::Vehicle"
-  sysml-visualize model.sysml output.svg --view Action --style stdcolor --element "PackageName"
+  # Auto-discovery mode (finds all .sysml files in repo)
+  sysml-visualize output.svg --element "VehicleExample::Vehicle"
+  sysml-visualize output.svg --element "PackageName::ElementName" --view Interconnection
+  sysml-visualize output.svg --element "MyPackage" --view Tree --style stdcolor
 
 Available views: Default, Tree, State, Interconnection, Action, Sequence, Case, MIXED
 Available styles: stdcolor, sysmlbw, monochrome, (and custom kernel styles)
         """
-    )
-
-    parser.add_argument(
-        "input_file",
-        nargs="?",
-        help="Input SysML file path"
     )
 
     parser.add_argument(
@@ -148,21 +152,14 @@ Available styles: stdcolor, sysmlbw, monochrome, (and custom kernel styles)
         available_methods = print_dependency_status()
         sys.exit(0)
 
-    # Validate required arguments for visualization
-    if not args.input_file or not args.output_file:
-        print("Error: Both input_file and output_file are required for visualization")
-        parser.print_help()
-        sys.exit(1)
+    # Ensure output_file is provided for visualization operations
+    if not args.output_file:
+        parser.error("output_file is required for visualization operations")
 
     # Validate kernel dependencies
     missing_deps = validate_method_dependencies("kernel-api")
     if missing_deps:
         print(suggest_installation_commands("kernel-api"))
-        sys.exit(1)
-
-    # Validate input file exists
-    if not Path(args.input_file).exists():
-        print(f"Error: Input file does not exist: {args.input_file}")
         sys.exit(1)
 
     # Create output directory if needed
@@ -171,7 +168,6 @@ Available styles: stdcolor, sysmlbw, monochrome, (and custom kernel styles)
 
     # Perform visualization
     success = visualize_file(
-        args.input_file,
         args.output_file,
         args.view,
         args.style,

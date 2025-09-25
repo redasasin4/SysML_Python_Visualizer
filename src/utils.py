@@ -47,28 +47,61 @@ def check_dependencies() -> Dict[str, bool]:
 
 def find_conda_path() -> Optional[str]:
     """Find conda installation path."""
-    # Check common conda paths
-    possible_paths = [
+    import platform
+
+    # Check if conda is already in PATH first (most reliable)
+    conda_executable = shutil.which("conda")
+    if conda_executable:
+        return str(Path(conda_executable).parent)
+
+    # Check common conda paths based on platform
+    possible_paths = []
+
+    # Cross-platform user directories
+    possible_paths.extend([
         Path.home() / "miniconda" / "bin",
         Path.home() / "anaconda" / "bin",
         Path.home() / "miniforge" / "bin",
         Path.home() / "mambaforge" / "bin",
-        Path("/opt/conda/bin"),
-        Path("/usr/local/conda/bin")
-    ]
+    ])
+
+    # Platform-specific system paths
+    system = platform.system().lower()
+    if system == "linux":
+        possible_paths.extend([
+            Path("/opt/conda/bin"),
+            Path("/usr/local/conda/bin"),
+            Path("/usr/local/miniconda/bin"),
+            Path("/usr/local/anaconda/bin")
+        ])
+    elif system == "darwin":  # macOS
+        possible_paths.extend([
+            Path("/opt/conda/bin"),
+            Path("/usr/local/conda/bin"),
+            Path("/usr/local/miniconda/bin"),
+            Path("/usr/local/anaconda/bin")
+        ])
+    elif system == "windows":
+        # Windows conda installations
+        possible_paths.extend([
+            Path.home() / "miniconda" / "Scripts",
+            Path.home() / "anaconda" / "Scripts",
+            Path.home() / "miniforge" / "Scripts",
+            Path.home() / "mambaforge" / "Scripts",
+        ])
+        # Add potential system-wide installations
+        for drive in ['C:', 'D:']:
+            possible_paths.extend([
+                Path(f"{drive}/miniconda/Scripts"),
+                Path(f"{drive}/anaconda/Scripts"),
+                Path(f"{drive}/ProgramData/miniconda/Scripts"),
+                Path(f"{drive}/ProgramData/anaconda/Scripts")
+            ])
 
     for path in possible_paths:
-        if path.exists() and (path / "conda").exists():
+        conda_exe = "conda.exe" if system == "windows" else "conda"
+        if path.exists() and (path / conda_exe).exists():
             return str(path)
-
-    # Check if conda is already in PATH
-    try:
-        result = subprocess.run(["which", "conda"], capture_output=True, text=True)
-        if result.returncode == 0:
-            conda_path = Path(result.stdout.strip()).parent
-            return str(conda_path)
-    except:
-        pass
 
     return None
 
@@ -89,18 +122,56 @@ def check_sysml_kernel() -> bool:
 
 def check_plantuml() -> bool:
     """Check if PlantUML is available."""
-    # Check for plantuml command
+    import platform
+
+    # Check for plantuml command in PATH first (most reliable)
     if shutil.which('plantuml'):
         return True
 
-    # Check for plantuml.jar in common locations
-    possible_paths = [
-        Path.cwd() / "plantuml.jar",
-        Path("/usr/share/plantuml/plantuml.jar"),
-        Path("/opt/plantuml/plantuml.jar")
-    ]
+    # Check for plantuml.jar in common locations based on platform
+    possible_paths = []
 
-    return any(path.exists() for path in possible_paths)
+    # Current working directory (universal)
+    possible_paths.append(Path.cwd() / "plantuml.jar")
+
+    # Platform-specific paths
+    system = platform.system().lower()
+    if system == "linux":
+        possible_paths.extend([
+            Path("/usr/share/plantuml/plantuml.jar"),
+            Path("/opt/plantuml/plantuml.jar"),
+            Path("/usr/local/share/plantuml/plantuml.jar"),
+            Path("/usr/local/plantuml/plantuml.jar")
+        ])
+    elif system == "darwin":  # macOS
+        possible_paths.extend([
+            Path("/usr/local/share/plantuml/plantuml.jar"),
+            Path("/opt/plantuml/plantuml.jar"),
+            Path("/usr/local/plantuml/plantuml.jar"),
+            # Homebrew locations
+            Path("/usr/local/Cellar/plantuml"),  # Will need to check subdirs
+            Path("/opt/homebrew/Cellar/plantuml")  # Apple Silicon
+        ])
+    elif system == "windows":
+        # Common Windows installation directories
+        for drive in ['C:', 'D:']:
+            possible_paths.extend([
+                Path(f"{drive}/plantuml/plantuml.jar"),
+                Path(f"{drive}/Program Files/plantuml/plantuml.jar"),
+                Path(f"{drive}/Program Files (x86)/plantuml/plantuml.jar")
+            ])
+
+    # Check each path
+    for path in possible_paths:
+        if path.exists():
+            return True
+        # For directories like Homebrew Cellar, check for plantuml.jar in subdirectories
+        if path.is_dir() and "Cellar" in str(path):
+            for jar_file in path.rglob("plantuml.jar"):
+                if jar_file.exists():
+                    return True
+
+    return False
 
 
 def validate_method_dependencies(method: str) -> List[str]:
@@ -116,23 +187,12 @@ def validate_method_dependencies(method: str) -> List[str]:
     deps = check_dependencies()
     missing = []
 
-    if method == "kernel-integration":
+    if method == "kernel-api":
         if not deps['jupyter_client']:
             missing.append("jupyter_client (pip install jupyter-client)")
         if not deps['sysml_kernel']:
             missing.append("SysML kernel (conda install -c conda-forge sysml)")
 
-    elif method == "kernel-api":
-        if not deps['jupyter_client']:
-            missing.append("jupyter_client (pip install jupyter-client)")
-        if not deps['sysml_kernel']:
-            missing.append("SysML kernel (conda install -c conda-forge sysml)")
-
-    elif method == "standalone":
-        if not deps['graphviz']:
-            missing.append("GraphViz (apt install graphviz / brew install graphviz)")
-        if not deps['plantuml']:
-            missing.append("PlantUML (apt install plantuml / brew install plantuml)")
 
     return missing
 
@@ -156,21 +216,13 @@ def print_dependency_status():
     status = "✅" if deps['sysml_kernel'] else "❌"
     print(f"  {status} sysml kernel")
 
-    # Standalone dependencies
-    print("\nStandalone Method Dependencies:")
-    status = "✅" if deps['graphviz'] else "❌"
-    print(f"  {status} graphviz")
-    status = "✅" if deps['plantuml'] else "❌"
-    print(f"  {status} plantuml")
 
     print("\n" + "=" * 50)
 
     # Recommendations
     available_methods = []
     if deps['jupyter_client'] and deps['sysml_kernel']:
-        available_methods.extend(["kernel-integration", "kernel-api"])
-    if deps['graphviz'] and deps['plantuml']:
-        available_methods.append("standalone")
+        available_methods.append("kernel-api")
 
     if available_methods:
         print(f"✅ Available methods: {', '.join(available_methods)}")
@@ -214,25 +266,6 @@ def suggest_installation_commands(method: str) -> str:
             ""
         ])
 
-    if "GraphViz" in str(missing):
-        suggestions.extend([
-            "Install GraphViz:",
-            "  # Ubuntu/Debian:",
-            "  sudo apt install graphviz",
-            "  # macOS:",
-            "  brew install graphviz",
-            ""
-        ])
-
-    if "PlantUML" in str(missing):
-        suggestions.extend([
-            "Install PlantUML:",
-            "  # Ubuntu/Debian:",
-            "  sudo apt install plantuml",
-            "  # macOS:",
-            "  brew install plantuml",
-            ""
-        ])
 
     return "\n".join(suggestions)
 
@@ -240,6 +273,42 @@ def suggest_installation_commands(method: str) -> str:
 def ensure_output_directory(output_path: str) -> None:
     """Ensure output directory exists."""
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
+
+def find_sysml_files() -> List[str]:
+    """
+    Find all .sysml files in the current directory and subdirectories.
+
+    Returns:
+        List of absolute paths to .sysml files
+    """
+    sysml_files = []
+    for sysml_file in Path.cwd().rglob("*.sysml"):
+        sysml_files.append(str(sysml_file.absolute()))
+    return sorted(sysml_files)
+
+
+def combine_sysml_files(file_paths: List[str]) -> str:
+    """
+    Read and combine multiple SysML files into a single string.
+
+    Args:
+        file_paths: List of paths to SysML files
+
+    Returns:
+        Combined SysML content
+    """
+    combined_content = []
+    for file_path in file_paths:
+        try:
+            content = Path(file_path).read_text(encoding='utf-8')
+            combined_content.append(f"// From file: {file_path}")
+            combined_content.append(content)
+            combined_content.append("")  # Add blank line between files
+        except Exception as e:
+            print(f"Warning: Could not read {file_path}: {e}")
+
+    return "\n".join(combined_content)
 
 
 if __name__ == "__main__":

@@ -258,10 +258,28 @@ class SysMLKernelAPI:
 
         sysml_code = sysml_path.read_text()
 
+        return self.visualize_content(sysml_code, output_file, view=view, style=style, element=element)
+
+    def visualize_content(self, sysml_content, output_file=None, view=None, style=None, element=None):
+        """
+        Visualize SysML content and optionally save to output file.
+
+        Args:
+            sysml_content (str): SysML content to visualize
+            output_file (str, optional): Path to save SVG output
+            view (str, optional): Visualization view type
+            style (str, optional): Visualization style
+            element (str, optional): Specific element to visualize
+
+        Returns:
+            str: Path to output file or 'kernel_output.svg' if no output specified
+        """
+        from pathlib import Path
+
         # Generate visualization
         self.start_kernel()
         try:
-            outputs = self.visualize(sysml_code, view=view, style=style, element=element)
+            outputs = self.visualize(sysml_content, view=view, style=style, element=element)
 
             # Extract SVG from outputs
             svg_content = None
