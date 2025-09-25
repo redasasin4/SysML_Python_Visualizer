@@ -41,7 +41,7 @@ sys.path.insert(0, 'src')
 from kernel_api import SysMLKernelAPI
 
 visualizer = SysMLKernelAPI()
-result = visualizer.visualize_file("model.sysml", "output.svg")
+result = visualizer.visualize_file("output.svg")  # Auto-discovers all .sysml files
 print(f"Generated: {result}")
 ```
 
@@ -53,7 +53,7 @@ print(f"Generated: {result}")
 from sysml_visualizer import SysMLKernelAPI
 
 visualizer = SysMLKernelAPI()
-result = visualizer.visualize_file("model.sysml", "output.svg")
+result = visualizer.visualize_file("output.svg")  # Auto-discovers all .sysml files
 ```
 
 **Features:**
@@ -97,6 +97,11 @@ pip install sysml-v2-visualizer
 # Install with optional dependencies
 pip install sysml-v2-visualizer[kernel]     # For kernel API
 pip install sysml-v2-visualizer[dev]        # For development
+
+# OR install locally from source (development)
+pip install -e .                           # Editable install from current directory
+pip install -e .[kernel]                   # With kernel dependencies
+pip install -e .[dev]                      # With development dependencies
 ```
 
 ## 🚀 Usage Examples
@@ -181,16 +186,16 @@ from kernel_api import SysMLKernelAPI
 
 visualizer = SysMLKernelAPI()
 
-# Basic file visualization
-result = visualizer.visualize_file("model.sysml", "output.svg")
+# Auto-discovery visualization (finds all .sysml files)
+result = visualizer.visualize_file("output.svg")
 print(f"Generated {Path(result).stat().st_size} byte SVG")
 
 # With view and style options
-result = visualizer.visualize_file("model.sysml", "output.svg",
+result = visualizer.visualize_file("output.svg",
                                   view="Interconnection", style="stdcolor")
 
 # Visualize specific element
-result = visualizer.visualize_file("model.sysml", "output.svg",
+result = visualizer.visualize_file("output.svg",
                                   view="Tree", element="VehicleExample::Vehicle")
 
 # Direct SysML code visualization (interactive)
@@ -267,9 +272,8 @@ jobs:
 
       - name: Generate visualizations
         run: |
-          for file in models/*.sysml; do
-            sysml-visualize "$file" "diagrams/$(basename "$file" .sysml).svg"
-          done
+          # Auto-discovery mode - processes all .sysml files
+          sysml-visualize "diagrams/all-models.svg"
 
       - name: Upload diagrams
         uses: actions/upload-artifact@v3
@@ -342,13 +346,13 @@ black src/
    sysml-visualize --check-deps
 
    # Use with verbose output for troubleshooting
-   sysml-visualize model.sysml output.svg --verbose
+   sysml-visualize output.svg --verbose
    ```
 
 3. **No SVG Output**
    - Ensure your SysML code defines packages/elements
    - Check that SysML syntax is valid
-   - Try the working example first: `sysml-visualizer/examples/working_vehicle.sysml`
+   - Verify .sysml files exist in current directory or subdirectories
 
 ## 🤝 Contributing
 

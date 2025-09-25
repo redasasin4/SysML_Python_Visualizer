@@ -235,12 +235,12 @@ class SysMLKernelAPI:
 
         return outputs
 
-    def visualize_file(self, input_file, output_file=None, view=None, style=None, element=None):
+    def visualize_file(self, output_file=None, view=None, style=None, element=None):
         """
-        Visualize a SysML file and optionally save to output file.
+        Visualize all .sysml files and optionally save to output file.
+        Auto-discovers all .sysml files in current directory and subdirectories.
 
         Args:
-            input_file (str): Path to SysML file to visualize
             output_file (str, optional): Path to save SVG output
             view (str, optional): Visualization view type
             style (str, optional): Visualization style
@@ -250,14 +250,14 @@ class SysMLKernelAPI:
             str: Path to output file or 'kernel_output.svg' if no output specified
         """
         from pathlib import Path
+        from .utils import find_sysml_files, combine_sysml_files
 
-        # Read the SysML file
-        sysml_path = Path(input_file)
-        if not sysml_path.exists():
-            raise FileNotFoundError(f"SysML file not found: {input_file}")
+        # Auto-discover all .sysml files
+        sysml_files = find_sysml_files()
+        if not sysml_files:
+            raise FileNotFoundError("No .sysml files found in current directory or subdirectories")
 
-        sysml_code = sysml_path.read_text()
-
+        sysml_code = combine_sysml_files(sysml_files)
         return self.visualize_content(sysml_code, output_file, view=view, style=style, element=element)
 
     def visualize_content(self, sysml_content, output_file=None, view=None, style=None, element=None):
@@ -321,20 +321,20 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:
-  # Basic usage
-  python kernel_api.py viz_file model.sysml output.svg
+  # Auto-discovery mode (finds all .sysml files)
+  python kernel_api.py viz_file output.svg
 
   # Specify view type
-  python kernel_api.py viz_file model.sysml output.svg --view Interconnection
-  python kernel_api.py viz_file model.sysml output.svg --view Tree
-  python kernel_api.py viz_file model.sysml output.svg --view State
-  python kernel_api.py viz_file model.sysml output.svg --view Action
+  python kernel_api.py viz_file output.svg --view Interconnection
+  python kernel_api.py viz_file output.svg --view Tree
+  python kernel_api.py viz_file output.svg --view State
+  python kernel_api.py viz_file output.svg --view Action
 
   # Add styling
-  python kernel_api.py viz_file model.sysml output.svg --view Tree --style stdcolor
+  python kernel_api.py viz_file output.svg --view Tree --style stdcolor
 
   # Visualize specific element
-  python kernel_api.py viz_file model.sysml output.svg --element PackageName::ElementName
+  python kernel_api.py viz_file output.svg --element PackageName::ElementName
 
   # Execute SysML code directly
   python kernel_api.py execute "package Demo { part def Vehicle; }" output.svg --view Interconnection
@@ -358,7 +358,7 @@ Available Styles:
     parser.add_argument('command', choices=['execute', 'visualize', 'viz_file'],
                        help='Command to execute')
 
-    parser.add_argument('input', help='SysML code or file path')
+    parser.add_argument('input', nargs='?', help='SysML code (for execute/visualize commands)')
 
     parser.add_argument('output', nargs='?', default='kernel_output.svg',
                        help='Output SVG file (default: kernel_output.svg)')
@@ -382,20 +382,22 @@ Available Styles:
             sys.exit(1)
 
         if command == "execute":
+            if not args.input:
+                print("Error: Input SysML code is required for execute command")
+                sys.exit(1)
             code = args.input
             outputs = api.execute_code(code)
 
         elif command == "visualize":
+            if not args.input:
+                print("Error: Input SysML code is required for visualize command")
+                sys.exit(1)
             code = args.input
             outputs = api.visualize(code, view=args.view, style=args.style, element=args.element)
 
         elif command == "viz_file":
-            file_path = Path(args.input)
-            if not file_path.exists():
-                print(f"Error: File not found: {file_path}")
-                sys.exit(1)
-            code = file_path.read_text()
-            outputs = api.visualize(code, view=args.view, style=args.style, element=args.element)
+            # Auto-discover all .sysml files instead of requiring specific input file
+            outputs = api.visualize_file(view=args.view, style=args.style, element=args.element)
 
         else:
             print(f"Unknown command: {command}")
