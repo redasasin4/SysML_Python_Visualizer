@@ -21,66 +21,30 @@ Python package for generating authentic SVG diagrams from SysML v2 models using 
 
 ## 📋 Quick Start
 
-### Installation
-
 ```bash
-# Install UV (modern Python package manager)
+# Install UV and dependencies
 curl -LsSf https://astral.sh/uv/install.sh | sh
+conda install -c conda-forge jupyter-sysml-kernel
 
 # Clone and set up the project
 git clone https://github.com/redasasin4/SysML_Python_Visualizer.git
 cd SysML_Python_Visualizer
+uv venv && source .venv/bin/activate && uv pip install -e .
 
-# Create virtual environment and install dependencies
-uv venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-uv pip install -e .
-```
-
-### Basic Usage
-
-```bash
-# Check dependencies
+# Basic usage
 sysml-visualize --check-deps
-
-# Auto-discovery mode - Finds all .sysml files automatically
 sysml-visualize output.svg --element "VehicleExample::Vehicle"
-sysml-visualize output.svg --element "PackageName::ElementName" --view Interconnection
-sysml-visualize output.svg --element "MyPackage" --view Tree --style stdcolor
-```
-
-### Python API
-
-```python
-from sysml_v2_visualizer import SysMLKernelAPI
-
-visualizer = SysMLKernelAPI()
-result = visualizer.visualize_file("output.svg")  # Auto-discovers all .sysml files
-print(f"Generated: {result}")
 ```
 
 ## 🎯 SysML Kernel API
 
-**Professional SysML v2 visualization using the official kernel infrastructure**
-
-```python
-from sysml_v2_visualizer import SysMLKernelAPI
-
-visualizer = SysMLKernelAPI()
-result = visualizer.visualize_file("output.svg")  # Auto-discovers all .sysml files
-```
+Professional SysML v2 visualization using the official kernel infrastructure with 100% authentic diagram generation.
 
 **Features:**
-- ✅ **100% Authentic** - Uses official SysML v2 kernel API
-- ✅ **Complete SysML syntax** - Full `comp def`, `comp usage`, `skin sysmlbw` support
-- ✅ **PSysML protocol** - Full UUID linking support
-- ✅ **Full CLI support** - All kernel view types, styles, and element selection
-- ✅ **Interactive development** - Direct Jupyter kernel access
-- ✅ **Rich visualization** - Tree, Interconnection, Action, State, Sequence, Case, MIXED views
-
-**Requirements:**
-- SysML conda kernel (`conda install -c conda-forge jupyter-sysml-kernel`)
-- jupyter-client (`pip install jupyter-client`)
+- ✅ **Official Integration** - Uses SysML v2 kernel API with full syntax support
+- ✅ **Rich Visualization** - Tree, Interconnection, Action, State, Sequence, Case, MIXED views
+- ✅ **Intelligent Discovery** - Automatically processes all .sysml files
+- ✅ **Professional CLI** - Complete command-line tool with advanced options
 
 ## 📦 Installation
 
@@ -153,148 +117,56 @@ sysml-visualize --diagnose
 - `/opt/conda`, `/usr/local/conda`
 - User-level: `~/.local/share/jupyter`
 
-## 🚀 Usage Examples
+## 🚀 Usage
 
 ### Command Line Interface
 
 ```bash
-# Check dependencies
+# Basic usage with auto-discovery
+sysml-visualize output.svg --element "VehicleExample::Vehicle"
+sysml-visualize output.svg --element "PackageName" --view Interconnection --style stdcolor
+
+# Available views: Tree (default), Interconnection, Action, State, Sequence, Case, MIXED
+sysml-visualize output.svg --view Action --element "PackageName::ElementName"
+
+# Debugging and utilities
 sysml-visualize --check-deps
-
-# Auto-discovery mode (finds all .sysml files in repo)
-sysml-visualize output.svg --element "VehicleExample::Vehicle"
-sysml-visualize output.svg --element "PackageName::ElementName" --view Interconnection
-sysml-visualize output.svg --element "MyPackage" --view Tree --style stdcolor
-
-# With different views and styles
-sysml-visualize output.svg --view Action --style stdcolor --element "PackageName::ElementName"
-
-# Verbose output for debugging
-sysml-visualize output.svg --element "VehicleExample::Vehicle" --verbose
-
-# Show help
-sysml-visualize --help
+sysml-visualize output.svg --verbose --element "YourElement"
 ```
 
-### Advanced Visualization Options
-
-The SysML kernel API supports the full range of official SysML v2 visualization options:
-
-#### Available Views
-```bash
-# Tree view (default) - Hierarchical structure
-sysml-visualize output.svg --view Tree
-
-# Interconnection view - Shows relationships and connections
-sysml-visualize output.svg --view Interconnection
-
-# Action view - Focuses on action elements and flows
-sysml-visualize output.svg --view Action
-
-# State view - State-based diagrams
-sysml-visualize output.svg --view State
-
-# Sequence view - Sequence diagrams
-sysml-visualize output.svg --view Sequence
-
-# Case view - Use case scenarios
-sysml-visualize output.svg --view Case
-
-# Mixed view - Combination of multiple views
-sysml-visualize output.svg --view MIXED
-```
-
-#### Styling Options
-```bash
-# Standard color scheme
-sysml-visualize output.svg --view Tree --style stdcolor
-
-# Custom styles (as supported by kernel)
-sysml-visualize output.svg --view Interconnection --style custom
-```
-
-#### Element-Specific Visualization
-```bash
-# Visualize entire package
-sysml-visualize output.svg --element "VehicleExample"
-
-# Visualize specific part definition
-sysml-visualize output.svg --element "VehicleExample::Vehicle"
-
-# Combine with views and styles
-sysml-visualize output.svg --view Action --style stdcolor --element "VehicleExample::Vehicle"
-```
-
-### Python API Examples
+### Python API
 
 ```python
-# Import from the package
 from sysml_v2_visualizer import SysMLKernelAPI
-from pathlib import Path
 
+# Basic usage
 visualizer = SysMLKernelAPI()
-
-# Auto-discovery visualization (finds all .sysml files)
 result = visualizer.visualize_file("output.svg")
-print(f"Generated {Path(result).stat().st_size} byte SVG")
 
-# With view and style options
+# With options
 result = visualizer.visualize_file("output.svg",
-                                  view="Interconnection", style="stdcolor")
+                                  view="Interconnection",
+                                  style="stdcolor",
+                                  element="VehicleExample::Vehicle")
 
-# Visualize specific element
-result = visualizer.visualize_file("output.svg",
-                                  view="Tree", element="VehicleExample::Vehicle")
-
-# Direct SysML code visualization (interactive)
+# Interactive usage
 api = SysMLKernelAPI()
 api.start_kernel()
 try:
-    outputs = api.visualize("package Demo { part def Vehicle; }",
-                           view="Action", style="stdcolor")
+    outputs = api.visualize("package Demo { part def Vehicle; }")
 finally:
     api.stop_kernel()
 ```
 
 ## 📖 Command Reference
 
-### Available View Types
-
-The SysML Kernel API supports the full range of official SysML v2 visualization views:
-
-- **Default**: Default kernel view
-- **Tree** (default): Hierarchical structure view showing element relationships
-- **Interconnection**: Relationship and connection diagrams
-- **Action**: Behavioral elements and action flows
-- **State**: State machine diagrams and state transitions
-- **Sequence**: Sequence diagrams showing interactions over time
-- **Case**: Use case scenarios and case-based views
-- **MIXED**: Combined view types for comprehensive visualization
-
-### Available Styles
-
-The SysML Kernel API supports various styling options to enhance visual presentation:
-
-- **stdcolor**: Standard color scheme for improved readability
-- **sysmlbw**: Black and white SysML styling (built-in)
-- **monochrome**: Monochrome styling option
-- **Custom styles**: Any style supported by the underlying PlantUML/SysML kernel
-
-
-### CLI Options Reference
-
-#### Visualization Options
-- `--view <VIEW_TYPE>`: Specify visualization view type (see Available View Types)
-- `--style <STYLE>`: Apply styling options (see Available Styles)
-- `--element <ELEMENT_PATH>`: Target specific model element
-  - Package level: `"VehicleExample"`
-  - Element level: `"VehicleExample::Vehicle"`
-  - Nested elements: `"VehicleExample::Vehicle::Engine"`
-
-#### Utility Options
-- `--verbose`: Enable verbose output for debugging
-- `--check-deps`: Verify dependencies and show available methods
-- `--help`: Display help information
+### CLI Options
+- `--view <VIEW>`: Tree (default), Interconnection, Action, State, Sequence, Case, MIXED
+- `--style <STYLE>`: stdcolor, sysmlbw, monochrome, or custom styles
+- `--element <PATH>`: Target specific elements (`"Package"` or `"Package::Element"`)
+- `--verbose`: Enable detailed output
+- `--check-deps`: Verify installation
+- `--diagnose`: Run comprehensive diagnostics
 
 ### CI/CD Integration
 
@@ -406,147 +278,34 @@ flake8 src/
 
 ## 🔧 Troubleshooting
 
+### Quick Diagnostics
+```bash
+sysml-visualize --check-deps    # Basic dependency check
+sysml-visualize --diagnose      # Comprehensive system diagnostics
+```
+
 ### Common Issues
 
-#### 1. **Kernel Not Found / Path Issues**
+**Kernel Not Found:**
+- Tool automatically detects conda installations in common paths
+- If issues persist: `export PATH="$HOME/miniconda/bin:$PATH"`
+- Verify: `jupyter kernelspec list` (should show 'sysml' kernel)
 
-The tool now automatically detects system-wide kernel installations, but if you still encounter issues:
-
-**Diagnostic commands:**
+**Missing Dependencies:**
 ```bash
-# Check dependency status (basic) - now with auto-detection!
-sysml-visualize --check-deps
-
-# Run comprehensive diagnostics (shows auto-detected paths)
-sysml-visualize --diagnose
-
-# Manual checks (if needed)
-which jupyter
-which conda
-jupyter kernelspec list
-```
-
-**🆕 Automatic Detection Features:**
-- Automatically searches common conda installation paths (`/miniforge3`, `/miniconda3`, `/anaconda3`, etc.)
-- Automatically sets up `JUPYTER_PATH` to include system kernels
-- Searches user-level and system-level kernel locations
-- Works with miniforge, miniconda, anaconda installations
-
-**Common solutions:**
-
-a) **Add conda to PATH:**
-```bash
-# Find your conda installation
-ls ~/miniconda/bin/conda || ls ~/anaconda/bin/conda
-
-# Add to PATH (replace with your actual path)
-export PATH="$HOME/miniconda/bin:$PATH"
-# or
-export PATH="$HOME/anaconda/bin:$PATH"
-
-# Make permanent by adding to ~/.bashrc or ~/.zshrc
-echo 'export PATH="$HOME/miniconda/bin:$PATH"' >> ~/.bashrc
-```
-
-b) **Activate conda environment:**
-```bash
-# Activate base conda environment
-conda activate base
-# or use full path
-~/miniconda/bin/conda activate base
-
-# Then verify kernel
-jupyter kernelspec list
-```
-
-c) **Reinstall kernel with full paths:**
-```bash
-# Use full conda path if conda not in PATH
-~/miniconda/bin/conda install -c conda-forge jupyter-sysml-kernel
-# or
-~/anaconda/bin/conda install -c conda-forge jupyter-sysml-kernel
-```
-
-#### 2. **SysML Kernel Installation Issues**
-
-```bash
-# Verify SysML kernel installation
-jupyter kernelspec list  # Should show 'sysml' kernel
-conda list sysml          # Should show sysml package
-
-# If kernel missing, reinstall
 conda install -c conda-forge jupyter-sysml-kernel
-
-# If conda missing, install miniconda/miniforge first
-curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
-bash Miniforge3-$(uname)-$(uname -m).sh
+source .venv/bin/activate && uv pip install -e .
 ```
 
-#### 3. **Environment/Virtual Environment Issues**
-
-```bash
-# Make sure you're in the UV virtual environment
-source .venv/bin/activate
-
-# Verify package installation
-python -c "from sysml_v2_visualizer import SysMLKernelAPI; print('✅ Package works')"
-
-# Check dependency status with enhanced diagnostics
-sysml-visualize --check-deps
-```
-
-#### 4. **Permission/Access Issues**
-
-```bash
-# Check file permissions on conda installation
-ls -la ~/miniconda/bin/jupyter ~/miniconda/bin/conda
-
-# If permission issues, try:
-chmod +x ~/miniconda/bin/jupyter ~/miniconda/bin/conda
-
-# Or reinstall with proper permissions
-bash Miniforge3-$(uname)-$(uname -m).sh
-```
-
-#### 5. **Multiple Conda/Python Installations**
-
-```bash
-# Check which python/conda you're using
-which python
-which conda
-which jupyter
-
-# List all python installations
-ls -la /usr/bin/python* ~/miniconda/bin/python* ~/anaconda/bin/python*
-
-# Ensure consistency - all should point to same conda installation
-```
-
-#### 6. **Debugging with Verbose Output**
-
-```bash
-# Run comprehensive system diagnostics
-sysml-visualize --diagnose
-
-# Run with verbose output for troubleshooting
-sysml-visualize output.svg --verbose --element "YourPackage::YourElement"
-
-# Check if .sysml files are found
-ls -la *.sysml **/*.sysml
-```
-
-#### 7. **No SVG Output**
-   - Ensure your SysML code defines packages/elements
-   - Check that SysML syntax is valid
-   - Verify .sysml files exist in current directory or subdirectories
-   - Try different view types: `--view Tree`, `--view Interconnection`
+**No SVG Output:**
+- Ensure .sysml files exist in directory
+- Check SysML syntax is valid
+- Try different views: `--view Tree`, `--view Interconnection`
+- Use `--verbose` for detailed debugging
 
 ### Getting Help
 
-If issues persist:
-1. Run `sysml-visualize --diagnose` and share the output
-2. Include your OS, conda version, and installation method
-3. Check if the issue exists in a fresh conda environment
+If issues persist, run `sysml-visualize --diagnose` and share the output along with your OS and conda version.
 
 ## 🤝 Contributing
 
