@@ -128,6 +128,12 @@ Available styles: stdcolor, sysmlbw, monochrome, (and custom kernel styles)
         help="Check dependency status and exit"
     )
 
+    parser.add_argument(
+        "--diagnose",
+        action="store_true",
+        help="Run detailed diagnostics for troubleshooting"
+    )
+
     # Visualization options
     parser.add_argument(
         "--view",
@@ -150,6 +156,58 @@ Available styles: stdcolor, sysmlbw, monochrome, (and custom kernel styles)
     # Check dependencies if requested
     if args.check_deps:
         available_methods = print_dependency_status()
+        sys.exit(0)
+
+    # Run detailed diagnostics if requested
+    if args.diagnose:
+        from .utils import get_kernel_diagnostics
+        import json
+
+        print("🔬 Detailed Diagnostics:")
+        print("=" * 50)
+
+        diagnostics = get_kernel_diagnostics()
+
+        print(f"System Information:")
+        print(f"  OS: {sys.platform}")
+        print(f"  Python: {sys.version}")
+
+        print(f"\nPath Information:")
+        print(f"  jupyter in PATH: {diagnostics['jupyter_in_path']}")
+        print(f"  jupyter executable: {diagnostics['jupyter_executable']}")
+        print(f"  conda path: {diagnostics['conda_path']}")
+
+        print(f"\nKernel Information:")
+        print(f"  SysML kernel found: {diagnostics['sysml_kernel_found']}")
+
+        if diagnostics['kernel_list_output']:
+            print(f"\nAvailable kernels:")
+            for line in diagnostics['kernel_list_output'].split('\n'):
+                line = line.strip()
+                if line and not line.startswith('Available'):
+                    print(f"  {line}")
+
+        if diagnostics['error_messages']:
+            print(f"\nErrors encountered:")
+            for error in diagnostics['error_messages']:
+                print(f"  • {error}")
+
+        print(f"\nEnvironment Variables:")
+        import os
+        relevant_vars = ['PATH', 'CONDA_DEFAULT_ENV', 'CONDA_PREFIX', 'JUPYTER_PATH']
+        for var in relevant_vars:
+            value = os.environ.get(var, 'Not set')
+            if var == 'PATH':
+                # Split PATH for readability
+                paths = value.split(':') if value != 'Not set' else []
+                print(f"  {var}:")
+                for p in paths[:10]:  # Show first 10 paths
+                    print(f"    {p}")
+                if len(paths) > 10:
+                    print(f"    ... and {len(paths) - 10} more paths")
+            else:
+                print(f"  {var}: {value}")
+
         sys.exit(0)
 
     # Ensure output_file is provided for visualization operations

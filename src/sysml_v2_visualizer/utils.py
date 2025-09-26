@@ -106,18 +106,119 @@ def find_conda_path() -> Optional[str]:
     return None
 
 
+def find_jupyter_executable() -> Optional[str]:
+    """Find jupyter executable, checking both PATH and conda installations."""
+    import platform
+
+    # First check if jupyter is in PATH
+    jupyter_exe = shutil.which("jupyter")
+    if jupyter_exe:
+        return jupyter_exe
+
+    # If not in PATH, check conda installations
+    conda_path = find_conda_path()
+    if conda_path:
+        system = platform.system().lower()
+        jupyter_exe = "jupyter.exe" if system == "windows" else "jupyter"
+        jupyter_path = Path(conda_path) / jupyter_exe
+        if jupyter_path.exists():
+            return str(jupyter_path)
+
+    # Check common conda environment paths
+    possible_jupyter_paths = []
+    system = platform.system().lower()
+    jupyter_exe = "jupyter.exe" if system == "windows" else "jupyter"
+
+    # Check user conda environments
+    conda_envs = [
+        Path.home() / "miniconda" / "envs",
+        Path.home() / "anaconda" / "envs",
+        Path.home() / "miniforge" / "envs",
+        Path.home() / "mambaforge" / "envs",
+    ]
+
+    for env_base in conda_envs:
+        if env_base.exists():
+            for env_dir in env_base.iterdir():
+                if env_dir.is_dir():
+                    bin_dir = env_dir / ("Scripts" if system == "windows" else "bin")
+                    jupyter_path = bin_dir / jupyter_exe
+                    if jupyter_path.exists():
+                        possible_jupyter_paths.append(str(jupyter_path))
+
+    # Return first found jupyter executable
+    if possible_jupyter_paths:
+        return possible_jupyter_paths[0]
+
+    return None
+
+
 def check_sysml_kernel() -> bool:
-    """Check if SysML kernel is installed."""
-    try:
-        result = subprocess.run(
-            ["jupyter", "kernelspec", "list"],
-            capture_output=True,
-            text=True,
-            timeout=10
-        )
-        return "sysml" in result.stdout
-    except:
-        return False
+    """Check if SysML kernel is installed using various jupyter paths."""
+    jupyter_paths = []
+
+    # Try jupyter in PATH first
+    if shutil.which("jupyter"):
+        jupyter_paths.append("jupyter")
+
+    # Try finding jupyter in conda installations
+    jupyter_exe = find_jupyter_executable()
+    if jupyter_exe and jupyter_exe not in jupyter_paths:
+        jupyter_paths.append(jupyter_exe)
+
+    # Try each jupyter executable
+    for jupyter_path in jupyter_paths:
+        try:
+            result = subprocess.run(
+                [jupyter_path, "kernelspec", "list"],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result.returncode == 0 and "sysml" in result.stdout:
+                return True
+        except (subprocess.SubprocessError, FileNotFoundError, PermissionError):
+            continue
+
+    return False
+
+
+def get_kernel_diagnostics() -> Dict[str, any]:
+    """Get detailed diagnostics about kernel detection."""
+    diagnostics = {
+        'jupyter_in_path': shutil.which("jupyter") is not None,
+        'jupyter_executable': find_jupyter_executable(),
+        'conda_path': find_conda_path(),
+        'sysml_kernel_found': False,
+        'kernel_list_output': None,
+        'error_messages': []
+    }
+
+    jupyter_paths = []
+    if diagnostics['jupyter_in_path']:
+        jupyter_paths.append("jupyter")
+    if diagnostics['jupyter_executable']:
+        jupyter_paths.append(diagnostics['jupyter_executable'])
+
+    for jupyter_path in jupyter_paths:
+        try:
+            result = subprocess.run(
+                [jupyter_path, "kernelspec", "list"],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result.returncode == 0:
+                diagnostics['kernel_list_output'] = result.stdout
+                if "sysml" in result.stdout:
+                    diagnostics['sysml_kernel_found'] = True
+                    break
+            else:
+                diagnostics['error_messages'].append(f"Error with {jupyter_path}: {result.stderr}")
+        except Exception as e:
+            diagnostics['error_messages'].append(f"Exception with {jupyter_path}: {str(e)}")
+
+    return diagnostics
 
 
 def check_plantuml() -> bool:
@@ -198,8 +299,9 @@ def validate_method_dependencies(method: str) -> List[str]:
 
 
 def print_dependency_status():
-    """Print a summary of dependency status."""
+    """Print a comprehensive summary of dependency status with diagnostics."""
     deps = check_dependencies()
+    diagnostics = get_kernel_diagnostics()
 
     print("📋 Dependency Status:")
     print("=" * 50)
@@ -209,17 +311,53 @@ def print_dependency_status():
     status = "✅" if deps['jupyter_client'] else "❌"
     print(f"  {status} jupyter_client")
 
-    # Kernel dependencies
+    # Kernel dependencies with enhanced diagnostics
     print("\nKernel Method Dependencies:")
     status = "✅" if deps['conda'] else "❌"
-    print(f"  {status} conda")
+    conda_path = diagnostics['conda_path']
+    if conda_path:
+        print(f"  {status} conda (found at: {conda_path})")
+    else:
+        print(f"  {status} conda")
+
+    # Jupyter executable status
+    status = "✅" if diagnostics['jupyter_in_path'] else "❌"
+    print(f"  {status} jupyter in PATH")
+
+    if diagnostics['jupyter_executable']:
+        if not diagnostics['jupyter_in_path']:
+            print(f"      ℹ️  jupyter found at: {diagnostics['jupyter_executable']}")
+
+    # SysML kernel status with detailed diagnostics
     status = "✅" if deps['sysml_kernel'] else "❌"
     print(f"  {status} sysml kernel")
 
+    # If kernel not found, provide detailed diagnostics
+    if not deps['sysml_kernel']:
+        print("\n🔍 Kernel Diagnostics:")
+        if not diagnostics['jupyter_executable'] and not diagnostics['jupyter_in_path']:
+            print("  ❌ No jupyter executable found")
+            print("     💡 Try: conda install -c conda-forge jupyter")
+        else:
+            if diagnostics['error_messages']:
+                print("  ❌ Errors encountered:")
+                for error in diagnostics['error_messages']:
+                    print(f"     • {error}")
+
+            if diagnostics['kernel_list_output']:
+                print("  📋 Available kernels:")
+                for line in diagnostics['kernel_list_output'].split('\n'):
+                    line = line.strip()
+                    if line and not line.startswith('Available kernels'):
+                        print(f"     • {line}")
+
+                if 'sysml' not in diagnostics['kernel_list_output'].lower():
+                    print("  ❌ SysML kernel not found in available kernels")
+                    print("     💡 Try: conda install -c conda-forge sysml")
 
     print("\n" + "=" * 50)
 
-    # Recommendations
+    # Recommendations with enhanced suggestions
     available_methods = []
     if deps['jupyter_client'] and deps['sysml_kernel']:
         available_methods.append("kernel-api")
@@ -227,7 +365,25 @@ def print_dependency_status():
     if available_methods:
         print(f"✅ Available methods: {', '.join(available_methods)}")
     else:
-        print("❌ No visualization methods available. Please install dependencies.")
+        print("❌ No visualization methods available.")
+        print("\n💡 Troubleshooting suggestions:")
+
+        if not deps['conda']:
+            print("  1. Install conda/miniconda:")
+            print("     curl -L -O https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh")
+            print("     bash Miniforge3-$(uname)-$(uname -m).sh")
+
+        if not deps['sysml_kernel']:
+            if deps['conda'] or conda_path:
+                print("  2. Install SysML kernel:")
+                print("     conda install -c conda-forge sysml")
+                if conda_path and not diagnostics['jupyter_in_path']:
+                    print(f"     # Or use full path: {conda_path}/conda install -c conda-forge sysml")
+
+            if not diagnostics['jupyter_in_path'] and conda_path:
+                print("  3. Add conda to PATH or activate environment:")
+                print(f"     export PATH=\"{conda_path}:$PATH\"")
+                print("     # Or activate base environment: conda activate base")
 
     return available_methods
 

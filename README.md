@@ -18,7 +18,17 @@ Python package for generating authentic SVG diagrams from SysML v2 models using 
 ### Installation
 
 ```bash
-pip install sysml-v2-visualizer
+# Install UV (modern Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Clone and set up the project
+git clone <your-repo-url>
+cd sysml-v2-visualizer
+
+# Create virtual environment and install dependencies
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install -e .
 ```
 
 ### Basic Usage
@@ -36,9 +46,7 @@ sysml-visualize output.svg --element "MyPackage" --view Tree --style stdcolor
 ### Python API
 
 ```python
-import sys
-sys.path.insert(0, 'src')
-from kernel_api import SysMLKernelAPI
+from sysml_v2_visualizer import SysMLKernelAPI
 
 visualizer = SysMLKernelAPI()
 result = visualizer.visualize_file("output.svg")  # Auto-discovers all .sysml files
@@ -50,7 +58,7 @@ print(f"Generated: {result}")
 **Professional SysML v2 visualization using the official kernel infrastructure**
 
 ```python
-from sysml_visualizer import SysMLKernelAPI
+from sysml_v2_visualizer import SysMLKernelAPI
 
 visualizer = SysMLKernelAPI()
 result = visualizer.visualize_file("output.svg")  # Auto-discovers all .sysml files
@@ -73,9 +81,21 @@ result = visualizer.visualize_file("output.svg")  # Auto-discovers all .sysml fi
 ### Prerequisites
 
 1. **Python 3.8+**
-2. **Choose your method dependencies:**
+2. **UV Package Manager** (recommended)
+3. **SysML Kernel Dependencies**
 
-#### For SysML Kernel API:
+### Step-by-Step Setup
+
+#### 1. Install UV
+```bash
+# Install UV (fast Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Add to your PATH (or restart terminal)
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+#### 2. Install SysML Kernel
 ```bash
 # Install conda if needed
 curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
@@ -88,20 +108,25 @@ conda install -c conda-forge sysml
 jupyter kernelspec list  # Should show 'sysml' kernel
 ```
 
-### Package Installation
-
+#### 3. Set up the Project
 ```bash
-# Install base package
-pip install sysml-v2-visualizer
+# Clone the repository
+git clone <your-repo-url>
+cd sysml-v2-visualizer
 
-# Install with optional dependencies
-pip install sysml-v2-visualizer[kernel]     # For kernel API
-pip install sysml-v2-visualizer[dev]        # For development
+# Create virtual environment with UV
+uv venv
 
-# OR install locally from source (development)
-pip install -e .                           # Editable install from current directory
-pip install -e .[kernel]                   # With kernel dependencies
-pip install -e .[dev]                      # With development dependencies
+# Activate virtual environment
+source .venv/bin/activate  # Linux/macOS
+# or
+.venv\Scripts\activate  # Windows
+
+# Install project in editable mode
+uv pip install -e .
+
+# Install with development dependencies (optional)
+uv pip install -e . --group dev
 ```
 
 ## 🚀 Usage Examples
@@ -179,10 +204,9 @@ sysml-visualize output.svg --view Action --style stdcolor --element "VehicleExam
 ### Python API Examples
 
 ```python
-# Kernel API (Recommended)
-import sys
-sys.path.insert(0, 'src')
-from kernel_api import SysMLKernelAPI
+# Import from the package
+from sysml_v2_visualizer import SysMLKernelAPI
+from pathlib import Path
 
 visualizer = SysMLKernelAPI()
 
@@ -199,8 +223,13 @@ result = visualizer.visualize_file("output.svg",
                                   view="Tree", element="VehicleExample::Vehicle")
 
 # Direct SysML code visualization (interactive)
-result = visualizer.visualize("package Demo { part def Vehicle; }",
-                             view="Action", style="stdcolor")
+api = SysMLKernelAPI()
+api.start_kernel()
+try:
+    outputs = api.visualize("package Demo { part def Vehicle; }",
+                           view="Action", style="stdcolor")
+finally:
+    api.stop_kernel()
 ```
 
 ## 📖 Command Reference
@@ -267,8 +296,15 @@ jobs:
         shell: bash -l {0}
         run: conda install -c conda-forge sysml
 
-      - name: Install visualizer
-        run: pip install sysml-v2-visualizer[kernel]
+      - name: Install UV
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Set up project
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          uv venv
+          source .venv/bin/activate
+          uv pip install -e .
 
       - name: Generate visualizations
         run: |
@@ -287,15 +323,18 @@ jobs:
 ```
 sysml-v2-visualizer/
 ├── src/
-│   ├── __init__.py              # Package exports
-│   ├── kernel_api.py           # SysML Kernel API
-│   ├── cli.py                  # Command line interface
-│   ├── utils.py                # Utility functions
-│   └── sysmlbw.skin           # Authentic SysML skin file
+│   └── sysml_v2_visualizer/    # Main package
+│       ├── __init__.py         # Package exports
+│       ├── kernel_api.py       # SysML Kernel API
+│       ├── cli.py              # Command line interface
+│       ├── utils.py            # Utility functions
+│       └── sysmlbw.skin       # Authentic SysML skin file
 ├── examples/                   # Example SysML files and generated SVGs
 │   ├── working_vehicle.sysml
 │   └── *.svg                  # Generated example visualizations
-├── setup.py                    # Package configuration
+├── pyproject.toml              # Modern package configuration
+├── uv.lock                     # Dependency lock file
+├── .venv/                      # Virtual environment (created by uv)
 └── README.md                   # This file
 ```
 
@@ -305,17 +344,32 @@ sysml-v2-visualizer/
 
 ```bash
 # Clone repository
-git clone https://github.com/redasasin4/SysML_Python_Visualizer.git
-cd SysML_Python_Visualizer
+git clone <your-repo-url>
+cd sysml-v2-visualizer
 
-# Install in development mode
-pip install -e .[dev]
+# Install UV if not already installed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
+
+# Create and activate virtual environment
+uv venv
+source .venv/bin/activate  # Linux/macOS
+# or .venv\Scripts\activate  # Windows
+
+# Install project with development dependencies
+uv pip install -e . --group dev
 
 # Run tests
 pytest
 
 # Format code
 black src/
+
+# Type checking
+mypy src/
+
+# Linting
+flake8 src/
 ```
 
 ### Adding New Features
@@ -330,29 +384,143 @@ black src/
 
 ### Common Issues
 
-1. **Kernel Not Found**
-   ```bash
-   # Verify SysML kernel installation
-   jupyter kernelspec list
-   conda list sysml
+#### 1. **Kernel Not Found / Path Issues**
 
-   # Reinstall if needed
-   conda install -c conda-forge sysml
-   ```
+The most common issue is that the SysML kernel is installed but not accessible due to PATH or environment issues.
 
-2. **Dependency Check**
-   ```bash
-   # Check what's available
-   sysml-visualize --check-deps
+**Diagnostic commands:**
+```bash
+# Check dependency status (basic)
+sysml-visualize --check-deps
 
-   # Use with verbose output for troubleshooting
-   sysml-visualize output.svg --verbose
-   ```
+# Run comprehensive diagnostics (advanced)
+sysml-visualize --diagnose
 
-3. **No SVG Output**
+# Manual checks
+which jupyter
+which conda
+jupyter kernelspec list
+
+# Try different paths if jupyter not in PATH
+~/miniconda/bin/jupyter kernelspec list
+~/anaconda/bin/jupyter kernelspec list
+```
+
+**Common solutions:**
+
+a) **Add conda to PATH:**
+```bash
+# Find your conda installation
+ls ~/miniconda/bin/conda || ls ~/anaconda/bin/conda
+
+# Add to PATH (replace with your actual path)
+export PATH="$HOME/miniconda/bin:$PATH"
+# or
+export PATH="$HOME/anaconda/bin:$PATH"
+
+# Make permanent by adding to ~/.bashrc or ~/.zshrc
+echo 'export PATH="$HOME/miniconda/bin:$PATH"' >> ~/.bashrc
+```
+
+b) **Activate conda environment:**
+```bash
+# Activate base conda environment
+conda activate base
+# or use full path
+~/miniconda/bin/conda activate base
+
+# Then verify kernel
+jupyter kernelspec list
+```
+
+c) **Reinstall kernel with full paths:**
+```bash
+# Use full conda path if conda not in PATH
+~/miniconda/bin/conda install -c conda-forge sysml
+# or
+~/anaconda/bin/conda install -c conda-forge sysml
+```
+
+#### 2. **SysML Kernel Installation Issues**
+
+```bash
+# Verify SysML kernel installation
+jupyter kernelspec list  # Should show 'sysml' kernel
+conda list sysml          # Should show sysml package
+
+# If kernel missing, reinstall
+conda install -c conda-forge sysml
+
+# If conda missing, install miniconda/miniforge first
+curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+bash Miniforge3-$(uname)-$(uname -m).sh
+```
+
+#### 3. **Environment/Virtual Environment Issues**
+
+```bash
+# Make sure you're in the UV virtual environment
+source .venv/bin/activate
+
+# Verify package installation
+python -c "from sysml_v2_visualizer import SysMLKernelAPI; print('✅ Package works')"
+
+# Check dependency status with enhanced diagnostics
+sysml-visualize --check-deps
+```
+
+#### 4. **Permission/Access Issues**
+
+```bash
+# Check file permissions on conda installation
+ls -la ~/miniconda/bin/jupyter ~/miniconda/bin/conda
+
+# If permission issues, try:
+chmod +x ~/miniconda/bin/jupyter ~/miniconda/bin/conda
+
+# Or reinstall with proper permissions
+bash Miniforge3-$(uname)-$(uname -m).sh
+```
+
+#### 5. **Multiple Conda/Python Installations**
+
+```bash
+# Check which python/conda you're using
+which python
+which conda
+which jupyter
+
+# List all python installations
+ls -la /usr/bin/python* ~/miniconda/bin/python* ~/anaconda/bin/python*
+
+# Ensure consistency - all should point to same conda installation
+```
+
+#### 6. **Debugging with Verbose Output**
+
+```bash
+# Run comprehensive system diagnostics
+sysml-visualize --diagnose
+
+# Run with verbose output for troubleshooting
+sysml-visualize output.svg --verbose --element "YourPackage::YourElement"
+
+# Check if .sysml files are found
+ls -la *.sysml **/*.sysml
+```
+
+#### 7. **No SVG Output**
    - Ensure your SysML code defines packages/elements
    - Check that SysML syntax is valid
    - Verify .sysml files exist in current directory or subdirectories
+   - Try different view types: `--view Tree`, `--view Interconnection`
+
+### Getting Help
+
+If issues persist:
+1. Run `sysml-visualize --diagnose` and share the output
+2. Include your OS, conda version, and installation method
+3. Check if the issue exists in a fresh conda environment
 
 ## 🤝 Contributing
 
