@@ -163,15 +163,23 @@ def find_system_kernel_paths() -> List[str]:
     # Common conda installation paths
     conda_bases = [
         Path.home() / "miniconda",
+        Path.home() / "miniconda3",
         Path.home() / "anaconda",
+        Path.home() / "anaconda3",
         Path.home() / "miniforge",
+        Path.home() / "miniforge3",
         Path.home() / "mambaforge",
+        Path.home() / "mambaforge3",
         Path("/opt/conda"),
         Path("/usr/local/conda"),
         Path("/opt/miniconda"),
+        Path("/opt/miniconda3"),
         Path("/opt/anaconda"),
+        Path("/opt/anaconda3"),
         Path("/opt/miniforge"),
+        Path("/opt/miniforge3"),
         Path("/opt/mambaforge"),
+        Path("/opt/mambaforge3"),
     ]
 
     # Add system-wide paths
@@ -207,6 +215,15 @@ def find_system_kernel_paths() -> List[str]:
             kernel_path = conda_base / "share" / "jupyter"
             if kernel_path.exists():
                 potential_paths.append(str(kernel_path))
+
+    # Also use the conda path we already discovered via find_conda_path()
+    conda_path = find_conda_path()
+    if conda_path:
+        # conda_path is like "/home/user/miniforge3/bin", we want "/home/user/miniforge3/share/jupyter"
+        conda_base = Path(conda_path).parent
+        kernel_path = conda_base / "share" / "jupyter"
+        if kernel_path.exists() and str(kernel_path) not in potential_paths:
+            potential_paths.append(str(kernel_path))
 
     # Also check user-level jupyter paths
     user_jupyter_paths = [
