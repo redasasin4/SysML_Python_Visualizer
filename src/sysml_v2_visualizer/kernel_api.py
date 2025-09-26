@@ -13,7 +13,7 @@ Key Features:
 - CI/CD ready implementation
 
 Requirements:
-- SysML v2 Jupyter kernel (conda install -c conda-forge sysml)
+- SysML v2 Jupyter kernel (conda install -c conda-forge jupyter-sysml-kernel)
 - jupyter-client Python package
 
 Example Usage:

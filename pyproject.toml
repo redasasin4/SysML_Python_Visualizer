@@ -42,10 +42,10 @@ dev = ["pytest", "black", "flake8", "mypy"]
 sysml-visualize = "sysml_v2_visualizer.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/your-org/sysml-v2-visualizer"
-"Bug Reports" = "https://github.com/your-org/sysml-v2-visualizer/issues"
-Source = "https://github.com/your-org/sysml-v2-visualizer"
-Documentation = "https://github.com/your-org/sysml-v2-visualizer/blob/main/README.md"
+Homepage = "https://github.com/redasasin4/SysML_Python_Visualizer"
+"Bug Reports" = "https://github.com/redasasin4/SysML_Python_Visualizer/issues"
+Source = "https://github.com/redasasin4/SysML_Python_Visualizer"
+Documentation = "https://github.com/redasasin4/SysML_Python_Visualizer/blob/main/README.md"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

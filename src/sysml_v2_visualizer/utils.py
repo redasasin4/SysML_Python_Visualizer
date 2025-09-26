@@ -153,8 +153,105 @@ def find_jupyter_executable() -> Optional[str]:
     return None
 
 
+def find_system_kernel_paths() -> List[str]:
+    """Find common system kernel installation paths."""
+    import platform
+
+    potential_paths = []
+    system = platform.system().lower()
+
+    # Common conda installation paths
+    conda_bases = [
+        Path.home() / "miniconda",
+        Path.home() / "anaconda",
+        Path.home() / "miniforge",
+        Path.home() / "mambaforge",
+        Path("/opt/conda"),
+        Path("/usr/local/conda"),
+        Path("/opt/miniconda"),
+        Path("/opt/anaconda"),
+        Path("/opt/miniforge"),
+        Path("/opt/mambaforge"),
+    ]
+
+    # Add system-wide paths
+    if system == "linux":
+        conda_bases.extend([
+            Path("/usr/share/miniconda"),
+            Path("/usr/share/anaconda"),
+            Path("/usr/local/miniconda"),
+            Path("/usr/local/anaconda"),
+        ])
+    elif system == "darwin":  # macOS
+        conda_bases.extend([
+            Path("/usr/local/miniconda"),
+            Path("/usr/local/anaconda"),
+            Path("/Applications/miniconda"),
+            Path("/Applications/anaconda"),
+        ])
+
+    # Also check for absolute paths like /miniforge3
+    absolute_conda_paths = [
+        Path("/miniforge3"),
+        Path("/miniconda3"),
+        Path("/anaconda3"),
+        Path("/opt/miniforge3"),
+        Path("/opt/miniconda3"),
+        Path("/opt/anaconda3"),
+    ]
+    conda_bases.extend(absolute_conda_paths)
+
+    # Look for jupyter kernel directories in each conda installation
+    for conda_base in conda_bases:
+        if conda_base.exists():
+            kernel_path = conda_base / "share" / "jupyter"
+            if kernel_path.exists():
+                potential_paths.append(str(kernel_path))
+
+    # Also check user-level jupyter paths
+    user_jupyter_paths = [
+        Path.home() / ".local" / "share" / "jupyter",
+        Path.home() / ".jupyter",
+    ]
+
+    for user_path in user_jupyter_paths:
+        if user_path.exists():
+            potential_paths.append(str(user_path))
+
+    return potential_paths
+
+
+def setup_jupyter_environment():
+    """Automatically set up JUPYTER_PATH to include system kernels."""
+    import os
+
+    system_paths = find_system_kernel_paths()
+    if not system_paths:
+        return
+
+    # Get current JUPYTER_PATH
+    current_path = os.environ.get('JUPYTER_PATH', '')
+
+    # Build new JUPYTER_PATH with system paths
+    new_paths = []
+    for path in system_paths:
+        if path not in current_path:
+            new_paths.append(path)
+
+    if new_paths:
+        if current_path:
+            new_jupyter_path = ':'.join(new_paths) + ':' + current_path
+        else:
+            new_jupyter_path = ':'.join(new_paths)
+
+        os.environ['JUPYTER_PATH'] = new_jupyter_path
+
+
 def check_sysml_kernel() -> bool:
-    """Check if SysML kernel is installed using various jupyter paths."""
+    """Check if SysML kernel is installed using various jupyter paths and auto-setup."""
+    # First, try to set up jupyter environment automatically
+    setup_jupyter_environment()
+
     jupyter_paths = []
 
     # Try jupyter in PATH first
@@ -185,10 +282,17 @@ def check_sysml_kernel() -> bool:
 
 def get_kernel_diagnostics() -> Dict[str, any]:
     """Get detailed diagnostics about kernel detection."""
+    import os
+
+    # Set up jupyter environment first
+    setup_jupyter_environment()
+
     diagnostics = {
         'jupyter_in_path': shutil.which("jupyter") is not None,
         'jupyter_executable': find_jupyter_executable(),
         'conda_path': find_conda_path(),
+        'system_kernel_paths': find_system_kernel_paths(),
+        'jupyter_path_env': os.environ.get('JUPYTER_PATH', 'Not set'),
         'sysml_kernel_found': False,
         'kernel_list_output': None,
         'error_messages': []
@@ -292,7 +396,7 @@ def validate_method_dependencies(method: str) -> List[str]:
         if not deps['jupyter_client']:
             missing.append("jupyter_client (pip install jupyter-client)")
         if not deps['sysml_kernel']:
-            missing.append("SysML kernel (conda install -c conda-forge sysml)")
+            missing.append("SysML kernel (conda install -c conda-forge jupyter-sysml-kernel)")
 
 
     return missing
@@ -353,7 +457,7 @@ def print_dependency_status():
 
                 if 'sysml' not in diagnostics['kernel_list_output'].lower():
                     print("  ❌ SysML kernel not found in available kernels")
-                    print("     💡 Try: conda install -c conda-forge sysml")
+                    print("     💡 Try: conda install -c conda-forge jupyter-sysml-kernel")
 
     print("\n" + "=" * 50)
 
@@ -376,9 +480,9 @@ def print_dependency_status():
         if not deps['sysml_kernel']:
             if deps['conda'] or conda_path:
                 print("  2. Install SysML kernel:")
-                print("     conda install -c conda-forge sysml")
+                print("     conda install -c conda-forge jupyter-sysml-kernel")
                 if conda_path and not diagnostics['jupyter_in_path']:
-                    print(f"     # Or use full path: {conda_path}/conda install -c conda-forge sysml")
+                    print(f"     # Or use full path: {conda_path}/conda install -c conda-forge jupyter-sysml-kernel")
 
             if not diagnostics['jupyter_in_path'] and conda_path:
                 print("  3. Add conda to PATH or activate environment:")
@@ -418,7 +522,7 @@ def suggest_installation_commands(method: str) -> str:
     if "SysML kernel" in str(missing):
         suggestions.extend([
             "Install SysML Kernel:",
-            "  conda install -c conda-forge sysml",
+            "  conda install -c conda-forge jupyter-sysml-kernel",
             ""
         ])
 

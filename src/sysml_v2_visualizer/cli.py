@@ -177,6 +177,15 @@ Available styles: stdcolor, sysmlbw, monochrome, (and custom kernel styles)
         print(f"  jupyter executable: {diagnostics['jupyter_executable']}")
         print(f"  conda path: {diagnostics['conda_path']}")
 
+        print(f"\nJupyter Environment:")
+        print(f"  JUPYTER_PATH: {diagnostics['jupyter_path_env']}")
+        if diagnostics['system_kernel_paths']:
+            print(f"  System kernel paths found:")
+            for path in diagnostics['system_kernel_paths']:
+                print(f"    {path}")
+        else:
+            print(f"  No system kernel paths detected")
+
         print(f"\nKernel Information:")
         print(f"  SysML kernel found: {diagnostics['sysml_kernel_found']}")
 

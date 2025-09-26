@@ -2,16 +2,22 @@
 
 Python package for generating authentic SVG diagrams from SysML v2 models using the official SysML Jupyter kernel infrastructure.
 
-## 🎯 Features
+## ✨ Features
 
-- **🔥 Official SysML Kernel API** - Direct integration with the SysML v2 kernel
-- **✨ 100% Authentic Output** - Uses official SysML v2 kernel infrastructure
-- **🚀 Auto-Discovery Mode** - Automatically finds and processes all .sysml files in your repository
-- **📦 Professional Package** - Easy installation with `pip install`
-- **🖥️ Advanced CLI Interface** - Full kernel view types, styles, and element selection
-- **🎨 Rich Visualization Options** - Tree, Interconnection, Action, State, Sequence, Case, MIXED views
-- **🔧 Dependency Management** - Automatic dependency checking and guidance
-- **📚 Comprehensive Documentation** - Examples and usage guides included
+**Core Functionality**
+- **Official SysML v2 Integration** - Direct access to the official SysML Jupyter kernel
+- **Authentic Diagram Generation** - 100% compatible with SysML v2 specifications
+- **Intelligent File Discovery** - Automatically processes all .sysml files in your project
+
+**User Experience**
+- **Professional CLI Interface** - Complete command-line tool with advanced options
+- **Multiple Visualization Views** - Tree, Interconnection, Action, State, Sequence, Case, and Mixed views
+- **Flexible Styling Options** - Standard colors, monochrome, and custom themes
+
+**Developer Experience**
+- **Smart Dependency Detection** - Automatic system kernel path discovery and setup
+- **Enhanced Troubleshooting** - Comprehensive diagnostics with `--diagnose` command
+- **Modern Python Packaging** - UV-compatible with proper virtual environment support
 
 ## 📋 Quick Start
 
@@ -22,8 +28,8 @@ Python package for generating authentic SVG diagrams from SysML v2 models using 
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone and set up the project
-git clone <your-repo-url>
-cd sysml-v2-visualizer
+git clone https://github.com/redasasin4/SysML_Python_Visualizer.git
+cd SysML_Python_Visualizer
 
 # Create virtual environment and install dependencies
 uv venv
@@ -73,7 +79,7 @@ result = visualizer.visualize_file("output.svg")  # Auto-discovers all .sysml fi
 - ✅ **Rich visualization** - Tree, Interconnection, Action, State, Sequence, Case, MIXED views
 
 **Requirements:**
-- SysML conda kernel (`conda install -c conda-forge sysml`)
+- SysML conda kernel (`conda install -c conda-forge jupyter-sysml-kernel`)
 - jupyter-client (`pip install jupyter-client`)
 
 ## 📦 Installation
@@ -102,7 +108,7 @@ curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Mi
 bash Miniforge3-$(uname)-$(uname -m).sh
 
 # Install SysML v2 kernel
-conda install -c conda-forge sysml
+conda install -c conda-forge jupyter-sysml-kernel
 
 # Verify installation
 jupyter kernelspec list  # Should show 'sysml' kernel
@@ -111,8 +117,8 @@ jupyter kernelspec list  # Should show 'sysml' kernel
 #### 3. Set up the Project
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd sysml-v2-visualizer
+git clone https://github.com/redasasin4/SysML_Python_Visualizer.git
+cd SysML_Python_Visualizer
 
 # Create virtual environment with UV
 uv venv
@@ -128,6 +134,24 @@ uv pip install -e .
 # Install with development dependencies (optional)
 uv pip install -e . --group dev
 ```
+
+### **✨ Automatic Kernel Detection**
+
+The tool now automatically detects SysML kernels installed system-wide! No manual `JUPYTER_PATH` setup needed:
+
+```bash
+# Just check if everything is detected
+sysml-visualize --check-deps
+
+# See detailed auto-detection info
+sysml-visualize --diagnose
+```
+
+**Supported installation paths:**
+- `/miniforge3`, `/miniconda3`, `/anaconda3`
+- `~/miniconda`, `~/anaconda`, `~/miniforge`
+- `/opt/conda`, `/usr/local/conda`
+- User-level: `~/.local/share/jupyter`
 
 ## 🚀 Usage Examples
 
@@ -294,7 +318,7 @@ jobs:
 
       - name: Install SysML kernel
         shell: bash -l {0}
-        run: conda install -c conda-forge sysml
+        run: conda install -c conda-forge jupyter-sysml-kernel
 
       - name: Install UV
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -321,7 +345,7 @@ jobs:
 ## 📁 Project Structure
 
 ```
-sysml-v2-visualizer/
+SysML_Python_Visualizer/
 ├── src/
 │   └── sysml_v2_visualizer/    # Main package
 │       ├── __init__.py         # Package exports
@@ -344,8 +368,8 @@ sysml-v2-visualizer/
 
 ```bash
 # Clone repository
-git clone <your-repo-url>
-cd sysml-v2-visualizer
+git clone https://github.com/redasasin4/SysML_Python_Visualizer.git
+cd SysML_Python_Visualizer
 
 # Install UV if not already installed
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -386,25 +410,27 @@ flake8 src/
 
 #### 1. **Kernel Not Found / Path Issues**
 
-The most common issue is that the SysML kernel is installed but not accessible due to PATH or environment issues.
+The tool now automatically detects system-wide kernel installations, but if you still encounter issues:
 
 **Diagnostic commands:**
 ```bash
-# Check dependency status (basic)
+# Check dependency status (basic) - now with auto-detection!
 sysml-visualize --check-deps
 
-# Run comprehensive diagnostics (advanced)
+# Run comprehensive diagnostics (shows auto-detected paths)
 sysml-visualize --diagnose
 
-# Manual checks
+# Manual checks (if needed)
 which jupyter
 which conda
 jupyter kernelspec list
-
-# Try different paths if jupyter not in PATH
-~/miniconda/bin/jupyter kernelspec list
-~/anaconda/bin/jupyter kernelspec list
 ```
+
+**🆕 Automatic Detection Features:**
+- Automatically searches common conda installation paths (`/miniforge3`, `/miniconda3`, `/anaconda3`, etc.)
+- Automatically sets up `JUPYTER_PATH` to include system kernels
+- Searches user-level and system-level kernel locations
+- Works with miniforge, miniconda, anaconda installations
 
 **Common solutions:**
 
@@ -436,9 +462,9 @@ jupyter kernelspec list
 c) **Reinstall kernel with full paths:**
 ```bash
 # Use full conda path if conda not in PATH
-~/miniconda/bin/conda install -c conda-forge sysml
+~/miniconda/bin/conda install -c conda-forge jupyter-sysml-kernel
 # or
-~/anaconda/bin/conda install -c conda-forge sysml
+~/anaconda/bin/conda install -c conda-forge jupyter-sysml-kernel
 ```
 
 #### 2. **SysML Kernel Installation Issues**
@@ -449,7 +475,7 @@ jupyter kernelspec list  # Should show 'sysml' kernel
 conda list sysml          # Should show sysml package
 
 # If kernel missing, reinstall
-conda install -c conda-forge sysml
+conda install -c conda-forge jupyter-sysml-kernel
 
 # If conda missing, install miniconda/miniforge first
 curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
